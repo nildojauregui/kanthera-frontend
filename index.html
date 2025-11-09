@@ -1,212 +1,244 @@
-<!doctype html>
-<html lang="it">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kanthera MVP</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kanthera — V1.2</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #0B1220;
+      color: #E5E7EB;
+      font-family: 'Inter', sans-serif;
+    }
+    .card {
+      background: #0E1628;
+      border: 1px solid #1E293B;
+      border-radius: 1rem;
+      padding: 1rem;
+      box-shadow: 0 0 10px #0002;
+    }
+    .btn {
+      background-color: #2563EB;
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+    }
+    .btn:hover { background-color: #1D4ED8; }
+    input, select {
+      background: #0B1220;
+      border: 1px solid #334155;
+      border-radius: 0.375rem;
+      padding: 0.4rem;
+      width: 100%;
+      color: #E5E7EB;
+    }
+  </style>
 </head>
-<body class="bg-[#0B1220] text-slate-100">
-  <header class="sticky top-0 bg-[#0B1220]/80 backdrop-blur border-b border-slate-800">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-blue-500 grid place-items-center font-bold">K</div>
-        <div class="font-semibold leading-tight">
-          KANTHERA
-          <div class="text-xs text-slate-400">Tu costruisci. Noi semplifichiamo.</div>
-        </div>
-      </div>
-      <nav class="text-sm text-slate-300 flex gap-4">
-        <a href="#dashboard" class="hover:text-white">Dashboard</a>
-        <a href="#sites" class="hover:text-white">Sites</a>
-        <a href="#workers" class="hover:text-white">Workers</a>
-        <a href="#pos" class="hover:text-white">POS</a>
-        <a href="#upload" class="hover:text-white">OCR Upload</a>
-      </nav>
-    </div>
+<body class="p-4">
+  <header class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-blue-400">Kanthera</h1>
+    <p class="text-sm text-slate-400 italic">Tu costruisci. Noi semplifichiamo.</p>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-6 space-y-8">
-    <section id="dashboard">
-      <h1 class="text-2xl font-semibold mb-3">Dashboard</h1>
-      <div class="grid md:grid-cols-3 gap-4">
-        <div class="bg-[#0E1628] p-4 rounded-xl border border-slate-800">
-          <div class="text-sm text-slate-400">Active sites</div>
-          <div id="k_sites" class="text-3xl font-semibold mt-1">—</div>
-        </div>
-        <div class="bg-[#0E1628] p-4 rounded-xl border border-slate-800">
-          <div class="text-sm text-slate-400">Docs due in 30 days</div>
-          <div id="k_due" class="text-3xl font-semibold mt-1">—</div>
-        </div>
-        <div class="bg-[#0E1628] p-4 rounded-xl border border-slate-800">
-          <div class="text-sm text-slate-400">Non-compliant workers</div>
-          <div id="k_noncomp" class="text-3xl font-semibold mt-1">—</div>
-        </div>
-      </div>
+  <main class="grid gap-6">
+    <!-- DASHBOARD -->
+    <section class="card">
+      <h2 class="text-lg font-semibold mb-2">CANTIERI</h2>
+      <div id="sites" class="grid gap-2"></div>
+      <button id="btnNewSite" class="btn mt-3">+ Nuovo Cantiere</button>
     </section>
 
-    <section id="sites">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl font-semibold">Sites</h2>
-        <button id="btnNewSite" class="px-3 py-2 rounded bg-blue-500 text-white text-sm">+ New Site</button>
-      </div>
-      <div id="sites_grid" class="mt-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    <!-- WORKERS -->
+    <section class="card">
+      <h2 class="text-lg font-semibold mb-2">LAVORATORI</h2>
+      <div id="workers" class="overflow-x-auto"></div>
+      <button id="btnNewWorker" class="btn mt-3">+ Nuovo Lavoratore</button>
     </section>
 
-    <section id="workers">
-      <h2 class="text-xl font-semibold">Workers</h2>
-      <div id="workers_grid" class="mt-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    </section>
-
-    <section id="pos">
-      <h2 class="text-xl font-semibold">POS Composer</h2>
-      <div class="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="lg:col-span-2 bg-[#0E1628] border border-slate-800 p-4 rounded-xl">
-          <div class="text-sm mb-3">Choose site:</div>
-          <select id="siteSelect" class="w-full bg-[#0B1220] border border-slate-700 rounded p-2 text-sm"></select>
-          <hr class="my-4 border-slate-800">
-          <div class="font-medium mb-2">Preview</div>
-          <pre id="posPreview" class="text-xs bg-[#0B1220] border border-slate-800 rounded p-3 whitespace-pre-wrap"></pre>
-        </div>
-        <div class="bg-[#0E1628] border border-slate-800 p-4 rounded-xl">
-          <div class="font-medium">Actions</div>
-          <button id="btnGen" class="mt-3 w-full px-3 py-2 rounded bg-blue-500 text-white text-sm">Generate POS (PDF)</button>
-          <div id="msg" class="text-xs text-slate-400 mt-2"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="upload">
-      <h2 class="text-xl font-semibold">OCR Upload</h2>
-      <div class="bg-[#0E1628] border border-slate-800 p-4 rounded-xl max-w-xl">
-        <input id="fileInput" type="file" class="w-full text-sm" accept=".pdf,.jpg,.jpeg,.png">
-        <button id="btnUpload" class="mt-3 px-3 py-2 rounded bg-blue-500 text-white text-sm">Upload & OCR</button>
-        <div id="uploadMsg" class="text-xs text-slate-400 mt-2"></div>
-        <pre id="ocrOut" class="text-xs bg-[#0B1220] border border-slate-800 rounded p-3 whitespace-pre-wrap mt-3"></pre>
-      </div>
+    <!-- POS -->
+    <section class="card">
+      <h2 class="text-lg font-semibold mb-2">POS Generator</h2>
+      <select id="siteSelect" class="mb-2"></select>
+      <button id="btnGen" class="btn">Genera POS</button>
+      <p id="msg" class="text-sm mt-2 text-slate-400"></p>
     </section>
   </main>
 
-  <footer class="border-t border-slate-800 py-6 mt-10 text-center text-xs text-slate-500">
-    © Kanthera — Tu costruisci. Noi semplifichiamo.
-  </footer>
-
-<script>
-// 👉 Backend API (Render)
-const API = 'https://kanthera-backend.onrender.com/api';
-// Base URL del backend (senza /api) per costruire link assoluti
-const API_BASE = API.replace(/\/api$/, '');
-// Preferisci sempre url assoluto se presente, altrimenti costruiscilo
-const absUrl = (resp) => resp.url || (API_BASE + (resp.file || ''));
-
-const daysLeft = (s)=>{ const d=new Date(s), t=new Date(); return Math.floor((d-t)/(1000*60*60*24)); };
-const badge = (dateStr)=>{
-  if(!dateStr) return '<span class="px-2 py-0.5 rounded-full text-xs bg-slate-700 text-slate-200">N/D</span>';
-  const d = daysLeft(dateStr);
-  if(d < 0) return '<span class="px-2 py-0.5 rounded-full text-xs bg-red-600 text-white">Expired</span>';
-  if(d <= 14) return '<span class="px-2 py-0.5 rounded-full text-xs bg-amber-500 text-black">≤14d</span>';
-  if(d <= 30) return '<span class="px-2 py-0.5 rounded-full text-xs bg-yellow-500 text-black">≤30d</span>';
-  return '<span class="px-2 py-0.5 rounded-full text-xs bg-emerald-600 text-white">OK</span>';
-};
-
-let sites = [], workers = [];
-
-async function loadAll(){
-  [sites, workers] = await Promise.all([
-    fetch(API + '/sites').then(r=>r.json()),
-    fetch(API + '/workers').then(r=>r.json())
-  ]);
-
-  // Dashboard
-  document.getElementById('k_sites').textContent = sites.length;
-  let due=0, non=0;
-  workers.forEach(w => ['corso','visita'].forEach(k=>{
-    const dt=w.docs?.[k]; if(!dt) return;
-    if(daysLeft(dt) <= 30) due++;
-    if(daysLeft(dt) <= 0) non++;
-  }));
-  document.getElementById('k_due').textContent = due;
-  document.getElementById('k_noncomp').textContent = non;
-
-  // Sites
-  document.getElementById('sites_grid').innerHTML = sites.map(s=>`
-    <div class="border border-slate-800 rounded-xl p-4 bg-[#0E1628]">
-      <div class="text-xs text-slate-400">${s.id}</div>
-      <div class="font-semibold">${s.name}</div>
-      <div class="text-sm text-slate-300">${s.address}</div>
-      <div class="mt-1 text-sm">Client: <span class="font-medium">${s.client}</span></div>
-      <div class="mt-2 text-sm">Period: ${s.dates.start} → ${s.dates.end}</div>
-    </div>`).join('');
-
-  // Workers
-  document.getElementById('workers_grid').innerHTML = workers.map(w=>`
-    <div class="bg-[#0E1628] border border-slate-800 p-4 rounded-xl">
-      <div class="text-xs text-slate-400">${w.id} • ${w.role}</div>
-      <div class="font-semibold">${w.name}</div>
-      <div class="text-sm text-slate-300">CF: ${w.cf}</div>
-      <div class="mt-2 text-sm flex gap-3 items-center">
-        <span>Course:</span> ${badge(w.docs?.corso)}
-        <span>Checkup:</span> ${badge(w.docs?.visita)}
+  <!-- NEW WORKER MODAL -->
+  <div id="workerModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-[#0E1628] p-6 rounded-xl w-full max-w-sm border border-slate-800">
+      <h3 class="text-lg font-semibold mb-4">Nuovo Lavoratore</h3>
+      <input id="m_name" placeholder="Nome e Cognome" class="mb-2">
+      <input id="m_cf" placeholder="Codice Fiscale" class="mb-2">
+      <input id="m_role" placeholder="Ruolo" class="mb-4">
+      <div class="flex justify-end gap-2">
+        <button id="closeModal" class="px-3 py-1 bg-slate-600 rounded text-sm">Annulla</button>
+        <button id="saveWorker" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Crea</button>
       </div>
-    </div>`).join('');
+    </div>
+  </div>
 
-  // POS
-  const siteSelect = document.getElementById('siteSelect');
-  siteSelect.innerHTML = sites.map(s=>`<option value="${s.id}">${s.id} — ${s.name}</option>`).join('');
-  function updatePreview(){
-    const sid = siteSelect.value || sites[0]?.id;
-    const s = sites.find(x=>x.id===sid) || sites[0];
-    const ws = workers.filter(w=>s.workers.includes(w.id));
-    const lines = [];
-    lines.push('POS – Piano Operativo di Sicurezza');
-    lines.push('Site: '+s.name+' — '+s.address);
-    lines.push('Client: '+s.client+' — '+s.client_cf_piva);
-    lines.push('CSE: '+s.cse.name+' — '+s.cse.email);
-    lines.push('Period: '+s.dates.start+' → '+s.dates.end);
-    lines.push('');
-    lines.push('Workers:');
-    ws.forEach(w=>lines.push(' - '+w.name+' ('+w.role+') • Course: '+(w.docs?.corso||'N/A')+' • Checkup: '+(w.docs?.visita||'N/A')));
-    document.getElementById('posPreview').textContent = lines.join('\n');
+  <!-- NEW SITE MODAL -->
+  <div id="siteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-[#0E1628] p-6 rounded-xl w-full max-w-sm border border-slate-800">
+      <h3 class="text-lg font-semibold mb-4">Nuovo Cantiere</h3>
+      <input id="s_name" placeholder="Nome cantiere" class="mb-2">
+      <input id="s_address" placeholder="Indirizzo" class="mb-2">
+      <input id="s_client" placeholder="Committente" class="mb-2">
+      <div class="flex justify-end gap-2">
+        <button id="closeSite" class="px-3 py-1 bg-slate-600 rounded text-sm">Annulla</button>
+        <button id="saveSite" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Crea</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AI Extraction Review -->
+  <div id="modalAI" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
+    <div class="bg-[#0E1628] p-6 rounded-xl w-full max-w-md border border-slate-800">
+      <h3 class="text-lg font-semibold mb-4">AI Extraction Review</h3>
+      <div id="ai_table" class="text-sm text-slate-200 mb-4"></div>
+      <div class="flex justify-end gap-2">
+        <button id="ai_cancel" class="px-3 py-1 bg-slate-600 rounded text-sm">Dismiss</button>
+        <button id="ai_save" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const API = 'https://kanthera-backend.onrender.com/api';
+  const API_BASE = API.replace(/\/api$/, '');
+  const absUrl = (r) => r.url || (API_BASE + r.file);
+
+  let workers = [], sites = [];
+
+  async function loadAll() {
+    [workers, sites] = await Promise.all([
+      fetch(API + '/workers').then(r=>r.json()),
+      fetch(API + '/sites').then(r=>r.json())
+    ]);
+    renderSites(); renderWorkersTable();
   }
-  siteSelect.onchange = updatePreview; updatePreview();
 
-  document.getElementById('btnGen').onclick = async ()=>{
+  function renderSites() {
+    sitesDiv.innerHTML = sites.map(s=>`
+      <div class="border border-slate-700 rounded p-2">
+        <div class="font-semibold">${s.name}</div>
+        <div class="text-xs text-slate-400">${s.address||''}</div>
+        <div class="text-xs text-slate-500">${s.client||''}</div>
+      </div>`).join('');
+    siteSelect.innerHTML = sites.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  }
+
+  function renderWorkersTable() {
+    workersDiv.innerHTML = `
+    <table class="min-w-full text-sm border border-slate-700 rounded">
+      <thead class="bg-slate-800 text-slate-300">
+        <tr><th class="p-2 text-left">Nome</th><th class="p-2">CF</th><th class="p-2">Ruolo</th><th class="p-2">Upload Doc</th></tr>
+      </thead>
+      <tbody>${workers.map(w=>`
+        <tr class="border-t border-slate-700">
+          <td class="p-2">${w.name}</td>
+          <td class="p-2">${w.cf}</td>
+          <td class="p-2">${w.role||''}</td>
+          <td class="p-2">
+            <input type="file" class="fileinput text-xs" style="width: 60%">
+            <button data-w="${w.id}" class="uploadBtn btn text-xs ml-1">Upload</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    attachUploadHandlers();
+  }
+
+  function attachUploadHandlers(){
+    document.querySelectorAll('.uploadBtn').forEach(btn=>{
+      btn.onclick = async ()=>{
+        const id = btn.dataset.w;
+        const f = btn.parentElement.querySelector('.fileinput').files?.[0];
+        if(!f){ alert('Choose a file'); return; }
+        const fd = new FormData(); fd.append('file', f);
+        btn.disabled = true; btn.textContent = 'Uploading...';
+        try {
+          const r = await fetch(`${API}/workers/${id}/docs`, { method:'POST', body:fd }).then(x=>x.json());
+          if(!r.ok) throw new Error(r.error || 'Upload error');
+          const e = r.extracted || {};
+          const html = `
+            <table class="w-full text-left text-xs border-collapse">
+              <tr><td class="text-slate-400 pr-2">Doc type:</td><td>${e.doc_type||'—'}</td></tr>
+              <tr><td class="text-slate-400 pr-2">Holder:</td><td>${e.holder_name||'—'}</td></tr>
+              <tr><td class="text-slate-400 pr-2">CF:</td><td>${e.cf||'—'}</td></tr>
+              <tr><td class="text-slate-400 pr-2">Issue:</td><td>${e.issue_date||'—'}</td></tr>
+              <tr><td class="text-slate-400 pr-2">Expiry:</td><td>${e.expiry_date||'—'}</td></tr>
+              <tr><td class="text-slate-400 pr-2">Confidence:</td><td>${Math.round((r.confidence||0)*100)}%</td></tr>
+            </table>`;
+          ai_table.innerHTML = html;
+          modalAI.classList.remove('hidden');
+          ai_cancel.onclick = ()=> modalAI.classList.add('hidden');
+          ai_save.onclick = async ()=>{
+            const patch = {
+              docs: { 
+                corso: e.doc_type?.includes('formazione') ? e.expiry_date : null,
+                visita: e.doc_type?.includes('visita') ? e.expiry_date : null
+              }
+            };
+            await fetch(`${API}/workers/${id}`, {
+              method:'PATCH',
+              headers:{'Content-Type':'application/json'},
+              body:JSON.stringify(patch)
+            });
+            modalAI.classList.add('hidden');
+            workers = await fetch(API + '/workers').then(x=>x.json());
+            renderWorkersTable();
+          };
+        } catch(e){ alert(e.message); }
+        finally { btn.disabled=false; btn.textContent='Upload'; }
+      };
+    });
+  }
+
+  // New Worker modal
+  btnNewWorker.onclick = ()=> workerModal.classList.remove('hidden');
+  closeModal.onclick = ()=> workerModal.classList.add('hidden');
+  saveWorker.onclick = async ()=>{
+    await fetch(API+'/workers',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ name:m_name.value, cf:m_cf.value, role:m_role.value })});
+    workerModal.classList.add('hidden');
+    workers = await fetch(API+'/workers').then(r=>r.json());
+    renderWorkersTable();
+  };
+
+  // New Site modal
+  btnNewSite.onclick = ()=> siteModal.classList.remove('hidden');
+  closeSite.onclick = ()=> siteModal.classList.add('hidden');
+  saveSite.onclick = async ()=>{
+    await fetch(API+'/sites',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ name:s_name.value, address:s_address.value, client:s_client.value })});
+    siteModal.classList.add('hidden');
+    sites = await fetch(API+'/sites').then(r=>r.json());
+    renderSites();
+  };
+
+  // POS generation
+  btnGen.onclick = async ()=>{
     const sid = siteSelect.value || sites[0]?.id;
     const s = sites.find(x=>x.id===sid) || sites[0];
-    const ws = workers.filter(w=>s.workers.includes(w.id));
+    const ws = workers.filter(w=>s.workers?.includes(w.id));
     const payload = { site:s, workers:ws, vars:{ activities:'—', risks:'—', measures:'—' } };
-
     const r = await fetch(API + '/pos', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)
     }).then(x=>x.json());
-
-    const msg = document.getElementById('msg');
-    if (r.ok) {
-      const url = absUrl(r);
-      msg.innerHTML = `PDF generated: <a class="underline hover:no-underline text-blue-400" href="${url}" target="_blank" rel="noopener">open POS</a>`;
-    } else {
-      msg.textContent = 'Error generating PDF';
-    }
+    msg.innerHTML = r.ok ? `PDF generated: <a href="${absUrl(r)}" target="_blank">open POS</a>` : 'Error';
   };
 
-  // OCR
-  document.getElementById('btnUpload').onclick = async ()=>{
-    const f = document.getElementById('fileInput').files[0];
-    if(!f){ document.getElementById('uploadMsg').textContent = 'Please choose a file'; return; }
-    const fd = new FormData(); fd.append('file', f);
-    document.getElementById('uploadMsg').textContent = 'Uploading…';
-    const r = await fetch(API + '/upload', { method:'POST', body:fd }).then(x=>x.json());
-    const url = r.ok ? absUrl(r) : null;
-    document.getElementById('uploadMsg').innerHTML = r.ok
-      ? `Uploaded: <a class="underline hover:no-underline text-blue-400" href="${url}" target="_blank" rel="noopener">${r.file}</a>`
-      : 'Error';
-    document.getElementById('ocrOut').textContent = r.ocr || '';
-  };
-}
-
-loadAll();
-</script>
+  const sitesDiv = document.getElementById('sites');
+  const workersDiv = document.getElementById('workers');
+  loadAll();
+  </script>
 </body>
 </html>
