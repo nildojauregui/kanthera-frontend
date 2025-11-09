@@ -1,329 +1,427 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KANTHERA — Unified UI</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KANTHERA — V1.5</title>
+  <!-- Tailwind (OK per MVP; in prod usa build) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body{background:#0B1220;color:#E5E7EB;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto}
-    .card{background:#0E1628;border:1px solid #1E293B;border-radius:1rem;padding:1rem}
-    .btn{background:#3B82F6;border-radius:.5rem;padding:.5rem .75rem}
-    .btn:hover{background:#2563EB}
-    input,select,textarea{background:#0B1220;border:1px solid #334155;border-radius:.375rem;padding:.45rem .6rem;width:100%}
-    th,td{padding:.5rem .6rem}
+    body { background:#0B1222; color:#D8E0F0; }
+    .card { background:#0E1628; border:1px solid #101B33; }
+    .brand-k { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#3B82F6; color:white; font-weight:800; }
+    .muted { color:#96A2BE; }
+    .chip { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; }
   </style>
 </head>
-<body class="p-4 max-w-6xl mx-auto">
-
-  <!-- HEADER -->
-  <header class="flex items-center justify-between mb-6">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-blue-500 grid place-content-center font-bold">K</div>
-      <div>
-        <div class="font-bold text-lg">KANTHERA</div>
-        <div class="text-xs text-slate-400">Tu costruisci. Noi semplifichiamo.</div>
+<body class="min-h-screen">
+  <!-- NAV -->
+  <header class="border-b border-slate-800/60 sticky top-0 z-40 bg-[#0B1222]/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="brand-k">K</span>
+        <div class="leading-4">
+          <div class="font-semibold">KANTHERA</div>
+          <div class="muted text-xs">Tu costruisci. Noi semplifichiamo.</div>
+        </div>
       </div>
+      <nav class="flex items-center gap-5 text-sm">
+        <a href="#dashboard" class="hover:text-white">Dashboard</a>
+        <a href="#sites" class="hover:text-white">Sites</a>
+        <a href="#workers" class="hover:text-white">Workers</a>
+        <a href="#pos" class="hover:text-white">POS</a>
+        <a href="#ocr" class="hover:text-white">OCR Upload</a>
+      </nav>
     </div>
   </header>
 
-  <!-- DASHBOARD CARDS -->
-  <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-    <div class="card">
-      <div class="text-slate-400 text-sm">Active sites</div>
-      <div id="kpi_active" class="text-2xl mt-2">—</div>
-    </div>
-    <div class="card">
-      <div class="text-slate-400 text-sm">Docs due in 30 days</div>
-      <div id="kpi_due" class="text-2xl mt-2">—</div>
-    </div>
-    <div class="card">
-      <div class="text-slate-400 text-sm">Non-compliant workers</div>
-      <div id="kpi_nc" class="text-2xl mt-2">—</div>
-    </div>
-  </section>
+  <main class="max-w-6xl mx-auto px-4 pb-24">
 
-  <!-- SITES -->
-  <section class="mb-8">
-    <div class="flex items-center justify-between mb-2">
-      <h2 class="font-semibold text-lg">Sites</h2>
-      <button id="btnNewSite" class="btn text-white text-sm">+ New Site</button>
-    </div>
-    <div id="sites" class="grid gap-3"></div>
-  </section>
-
-  <!-- WORKERS -->
-  <section class="mb-8">
-    <div class="flex items-center justify-between mb-2">
-      <h2 class="font-semibold text-lg">Workers</h2>
-      <button id="btnNewWorker" class="btn text-white text-sm">+ New Worker</button>
-    </div>
-    <div id="workers" class="card overflow-x-auto">
-      <!-- table rendered here -->
-    </div>
-  </section>
-
-  <!-- POS + OCR -->
-  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <div class="card lg:col-span-2">
-      <h3 class="font-semibold mb-3">POS Composer</h3>
-      <label class="text-sm text-slate-300 mb-1 block">Choose site:</label>
-      <select id="siteSelect"></select>
-      <label class="text-sm text-slate-300 mt-4 mb-1 block">Preview</label>
-      <input id="posPreview" disabled placeholder="Select a site to preview..." />
-    </div>
-    <div class="card">
-      <h3 class="font-semibold mb-3">Actions</h3>
-      <button id="btnGen" class="btn w-full text-white">Generate POS (PDF)</button>
-      <p id="msg" class="text-sm text-slate-400 mt-3"></p>
-    </div>
-  </section>
-
-  <section class="card mt-6">
-    <h3 class="font-semibold mb-3">OCR Upload (quick test)</h3>
-    <input type="file" id="ocrFile" class="mb-2"/>
-    <button id="ocrBtn" class="btn text-white">Upload & OCR</button>
-    <div id="ocrRes" class="text-sm text-slate-400 mt-3"></div>
-  </section>
-
-  <!-- NEW WORKER MODAL -->
-  <div id="workerModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-    <div class="bg-[#0E1628] p-6 rounded-xl w-full max-w-sm border border-slate-800">
-      <h3 class="text-lg font-semibold mb-4">New Worker</h3>
-      <input id="m_name" placeholder="Full name" class="mb-2">
-      <input id="m_cf" placeholder="Tax code (CF)" class="mb-2">
-      <input id="m_role" placeholder="Role" class="mb-4">
-      <div class="flex justify-end gap-2">
-        <button id="closeWorker" class="px-3 py-1 bg-slate-600 rounded text-sm">Cancel</button>
-        <button id="saveWorker" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Create</button>
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="pt-8">
+      <h2 class="text-xl font-semibold mb-3">Dashboard</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card rounded-xl p-4">
+          <div class="muted text-sm">Active sites</div>
+          <div id="kpiSites" class="text-3xl font-semibold mt-1">—</div>
+        </div>
+        <div class="card rounded-xl p-4">
+          <div class="muted text-sm">Docs due in 30 days</div>
+          <div id="kpiDue" class="text-3xl font-semibold mt-1">—</div>
+        </div>
+        <div class="card rounded-xl p-4">
+          <div class="muted text-sm">Non-compliant workers</div>
+          <div id="kpiBad" class="text-3xl font-semibold mt-1">—</div>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- NEW SITE MODAL -->
-  <div id="siteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-    <div class="bg-[#0E1628] p-6 rounded-xl w-full max-w-sm border border-slate-800">
-      <h3 class="text-lg font-semibold mb-4">New Site</h3>
-      <input id="s_name" placeholder="Site name" class="mb-2">
-      <input id="s_address" placeholder="Address" class="mb-2">
-      <input id="s_client" placeholder="Client" class="mb-4">
-      <div class="flex justify-end gap-2">
-        <button id="closeSite" class="px-3 py-1 bg-slate-600 rounded text-sm">Cancel</button>
-        <button id="saveSite" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Create</button>
+    <!-- SITES -->
+    <section id="sites" class="pt-10">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-semibold">Sites</h2>
+        <!-- (facoltativo) New Site pulsante: chiama una form o mostra modal -->
+        <!-- <button id="btnNewSite" class="px-3 py-2 rounded bg-sky-600 hover:bg-sky-500 text-white text-sm">+ New Site</button> -->
       </div>
-    </div>
-  </div>
+      <div id="sitesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
 
-  <!-- MODAL: AI Extraction Review -->
-  <div id="modalAI" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
-    <div class="bg-[#0E1628] p-6 rounded-xl w-full max-w-md border border-slate-800">
-      <h3 class="text-lg font-semibold mb-4">AI Extraction Review</h3>
-      <div id="ai_table" class="text-sm text-slate-200 mb-4"></div>
-      <div class="flex justify-end gap-2">
-        <button id="ai_cancel" class="px-3 py-1 bg-slate-600 rounded text-sm">Dismiss</button>
-        <button id="ai_save" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Save</button>
+    <!-- WORKERS -->
+    <section id="workers" class="pt-10">
+      <h2 class="text-xl font-semibold mb-3">Workers</h2>
+      <div id="workersTable"></div>
+    </section>
+
+    <!-- POS -->
+    <section id="pos" class="pt-10">
+      <h2 class="text-xl font-semibold mb-3">POS Composer</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="card rounded-xl p-4 lg:col-span-2">
+          <label class="muted text-sm">Choose site:</label>
+          <select id="posSite" class="w-full bg-slate-900/40 border border-slate-800 rounded-lg p-2 mt-1"></select>
+
+          <div class="muted text-sm mt-4">Preview</div>
+          <textarea id="posPreview" rows="10"
+            class="w-full bg-slate-900/40 border border-slate-800 rounded-lg p-3 font-mono text-sm mt-1"
+            readonly></textarea>
+        </div>
+        <div class="card rounded-xl p-4">
+          <div class="font-semibold mb-2">Actions</div>
+          <button id="btnGenPOS" class="w-full px-4 py-3 rounded bg-sky-600 hover:bg-sky-500 text-white">
+            Generate POS (PDF)
+          </button>
+          <div id="posLink" class="text-sm mt-3"></div>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-<script>
-/* ====== CONFIG ====== */
-const API = 'https://kanthera-backend.onrender.com/api'; // <-- cambia se il tuo backend ha un altro URL
-const API_BASE = API.replace(/\/api$/, '');
-const absUrl = (r) => r.url || (API_BASE + r.file);
-
-let workers = [], sites = [];
-
-/* ====== LOAD ====== */
-async function loadAll(){
-  const [ws, ss] = await Promise.all([
-    fetch(API+'/workers').then(r=>r.json()),
-    fetch(API+'/sites').then(r=>r.json())
-  ]);
-  workers = ws; sites = ss;
-  renderSites(); renderWorkers(); renderKpis();
-}
-function renderKpis(){
-  kpi_active.textContent = sites.length;
-  // placeholder KPI: docs due & non-compliant
-  kpi_due.textContent = workers.filter(w=>w?.docs?.visita || w?.docs?.corso).length;
-  kpi_nc.textContent = workers.filter(w=>!w?.docs || Object.values(w.docs).every(v=>!v)).length;
-}
-
-/* ====== SITES UI ====== */
-function renderSites(){
-  const c = document.getElementById('sites');
-
-  if (!sites.length) {
-    c.innerHTML = '<div class="text-slate-400 text-sm">No sites yet.</div>';
-    siteSelect.innerHTML = '';
-    posPreview.value = '';
-    return;
-  }
-
-  c.classList.add("grid","grid-cols-1","md:grid-cols-2","gap-4"); // layout cards
-
-  c.innerHTML = sites.map(s => {
-    const id = s.id || "";
-    const name = s.name || "";
-    const address = s.address || "";
-    const client = s.client || "";
-    const start = s.dates?.start || "";
-    const end = s.dates?.end || "";
-
-    return `
-      <div class="card hover:border-slate-600 transition">
-        <div class="text-[11px] text-slate-400 mb-1">${id}</div>
-        <div class="font-semibold mb-1">${name}</div>
-        ${address ? `<div class="text-[13px] text-slate-300 mb-1">${address}</div>` : ""}
-        ${client ? `<div class="text-[13px] mb-1">Client: <span class="font-semibold">${client}</span></div>` : ""}
-        ${(start || end) ? `<div class="text-[13px] text-slate-300">Period: ${start||"—"} → ${end||"—"}</div>` : ""}
+    <!-- OCR UPLOAD -->
+    <section id="ocr" class="pt-10">
+      <h2 class="text-xl font-semibold mb-3">OCR Upload</h2>
+      <div class="card rounded-xl p-4">
+        <div class="grid md:grid-cols-2 gap-3 items-end">
+          <div>
+            <label class="muted text-sm">Worker</label>
+            <select id="ocrWorker" class="w-full bg-slate-900/40 border border-slate-800 rounded-lg p-2 mt-1"></select>
+          </div>
+          <div>
+            <input id="ocrFile" type="file" class="block w-full text-sm file:mr-3 file:py-2 file:px-4 file:border-0 file:rounded file:text-sm file:bg-slate-800 file:text-white file:hover:bg-slate-700" />
+          </div>
+        </div>
+        <div class="mt-3 flex gap-2">
+          <button id="btnOCR" class="px-4 py-2 rounded bg-sky-600 hover:bg-sky-500 text-white">Upload & OCR</button>
+          <div id="ocrMsg" class="text-sm mt-2"></div>
+        </div>
       </div>
-    `;
-  }).join("");
+    </section>
 
-  // select POS
-  siteSelect.innerHTML = sites.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
-  const first = sites[0];
-  posPreview.value = first ? `${first.name} — ${first.client || ''}` : '';
-}
+  </main>
 
+  <script>
+    /* ========= CONFIG ========= */
+    // 🔧 Cambia SOLO questa riga col tuo backend Render:
+    const API = 'https://kanthera-backend.onrender.com/api';
 
-/* ====== WORKERS UI ====== */
-function renderWorkers(){
-  const el = document.getElementById('workers');
+    /* ========= STATE ========= */
+    let company = {};
+    let sites   = [];
+    let workers = [];
 
-  if (!workers.length) {
-    el.innerHTML = `<div class="text-slate-400 text-sm">No workers yet.</div>`;
-    return;
-  }
-
-  el.innerHTML = `
-    <table class="min-w-full text-sm">
-      <thead class="bg-slate-800 text-slate-300">
-        <tr>
-          <th class="text-left">Name</th>
-          <th class="text-left">CF</th>
-          <th class="text-left">Role</th>
-          <th class="text-left">Status</th>
-          <th class="text-left">Upload Doc (OCR)</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${workers.map(w => {
-          const status = (w.docs && Object.values(w.docs).some(Boolean)) ? 
-            '<span class="text-green-400">Docs on file</span>' : 
-            '<span class="text-slate-400">—</span>';
-
-          return `
-            <tr class="border-t border-slate-700">
-              <td class="text-left">${w.name}</td>
-              <td class="text-left">${w.cf || ''}</td>
-              <td class="text-left">${w.role || ''}</td>
-              <td class="text-left">${status}</td>
-              <td class="text-left">
-                <input type="file" class="fileinput text-xs" style="width:60%">
-                <button data-w="${w.id}" class="uploadBtn btn text-xs ml-1 text-white">Upload</button>
-              </td>
-            </tr>
-          `;
-        }).join('')}
-      </tbody>
-    </table>
-  `;
-
-  attachUploadHandlers();
-}
-
-function attachUploadHandlers(){
-  document.querySelectorAll('.uploadBtn').forEach(btn=>{
-    btn.onclick = async ()=>{
-      const id = btn.dataset.w;
-      const f = btn.parentElement.querySelector('.fileinput').files?.[0];
-      if(!f) return alert('Choose a file');
-      const fd = new FormData(); fd.append('file', f);
-      btn.disabled = true; btn.textContent = 'Uploading...';
-      try{
-        const r = await fetch(`${API}/workers/${id}/docs`,{method:'POST',body:fd}).then(x=>x.json());
-        if(!r.ok) throw new Error(r.error || 'Upload error');
-        // AI modal
-        const e = r.extracted || {};
-        ai_table.innerHTML = `
-          <table class="w-full text-left text-xs">
-            <tr><td class="text-slate-400 pr-2">Doc type:</td><td>${e.doc_type||'—'}</td></tr>
-            <tr><td class="text-slate-400 pr-2">Holder:</td><td>${e.holder_name||'—'}</td></tr>
-            <tr><td class="text-slate-400 pr-2">CF:</td><td>${e.cf||'—'}</td></tr>
-            <tr><td class="text-slate-400 pr-2">Issue:</td><td>${e.issue_date||'—'}</td></tr>
-            <tr><td class="text-slate-400 pr-2">Expiry:</td><td>${e.expiry_date||'—'}</td></tr>
-            <tr><td class="text-slate-400 pr-2">Confidence:</td><td>${Math.round((r.confidence||0)*100)}%</td></tr>
-          </table>`;
-        modalAI.classList.remove('hidden');
-        ai_cancel.onclick = ()=> modalAI.classList.add('hidden');
-        ai_save.onclick = async ()=>{
-          const patch = {
-            docs: {
-              corso: e.doc_type?.includes('formazione') ? e.expiry_date : null,
-              visita: e.doc_type?.includes('visita') ? e.expiry_date : null
-            }
-          };
-          await fetch(`${API}/workers/${id}`,{
-            method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)
-          });
-          modalAI.classList.add('hidden');
-          workers = await fetch(API+'/workers').then(r=>r.json());
-          renderWorkers(); renderKpis();
-        };
-      }catch(err){ alert(err.message); }
-      finally{ btn.disabled=false; btn.textContent='Upload'; }
+    /* ========= POLICIES ========= */
+    // chiavi docs standardizzate (come nel backend)
+    const REQUIRED_FOR_QUALIFIED = ['visita_medica','corso_generale','corso_specifica_fs','dpi_consegna','tesserino'];
+    const EXPIRY_KEYS = {
+      visita_medica:        365,          // base 1 anno (semplificato)
+      corso_generale:       365*5,
+      corso_specifica_fs:   365*5,
+      antincendio:          365*3,
+      ps:                   365*3
     };
-  });
-}
 
-/* ====== POS ====== */
-btnGen.onclick = async ()=>{
-  const sid = siteSelect.value || sites[0]?.id;
-  const s = sites.find(x=>x.id===sid) || sites[0];
-  const ws = workers.filter(w=>s?.workers?.includes(w.id));
-  const payload = { site:s, workers:ws, vars:{} };
-  const r = await fetch(API+'/pos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(x=>x.json());
-  msg.innerHTML = r.ok ? `PDF generated: <a class="underline" target="_blank" href="${absUrl(r)}">open</a>` : 'Error';
-};
+    /* ========= UTIL ========= */
+    function hasDoc(w, key) {
+      const v = w?.docs?.[key];
+      return v === true || (typeof v === 'string' && v.length >= 4);
+    }
+    function isQualified(w) {
+      return REQUIRED_FOR_QUALIFIED.every(k => hasDoc(w, k));
+    }
+    function progressLabel(w) {
+      const have = REQUIRED_FOR_QUALIFIED.filter(k => hasDoc(w,k)).length;
+      return have === REQUIRED_FOR_QUALIFIED.length ? 'Documentazione completata' : 'Documentazione da completare';
+    }
+    function daysUntil(dateStr){
+      if(!dateStr) return Infinity;
+      const d = new Date(dateStr);
+      if(isNaN(d)) return Infinity;
+      const diff = Math.floor((d - new Date())/86400000);
+      return diff;
+    }
+    const iconTick = '<span class="text-green-500">✔</span>';
+    const iconDash = '<span class="text-slate-400">—</span>';
 
-/* ====== OCR QUICK TEST (no worker link) ====== */
-ocrBtn.onclick = async ()=>{
-  const f = ocrFile.files?.[0]; if(!f) return alert('Pick a file');
-  const fd = new FormData(); fd.append('file', f);
-  // usa il primo worker esistente per test
-  const id = workers[0]?.id; if(!id) return alert('Create a worker first');
-  const r = await fetch(`${API}/workers/${id}/docs`,{method:'POST',body:fd}).then(x=>x.json());
-  ocrRes.textContent = r.ok ? JSON.stringify(r.extracted, null, 2) : 'Error';
-};
+    /* ========= RENDER: DASHBOARD ========= */
+    function renderDashboard(){
+      // KPI Sites
+      document.getElementById('kpiSites').textContent = sites.length || 0;
 
-/* ====== MODALS ====== */
-btnNewWorker.onclick = ()=> workerModal.classList.remove('hidden');
-closeWorker.onclick = ()=> workerModal.classList.add('hidden');
-saveWorker.onclick = async ()=>{
-  if(!m_name.value || !m_cf.value) return alert('Name & CF are required');
-  await fetch(API+'/workers',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:m_name.value, cf:m_cf.value, role:m_role.value})});
-  workerModal.classList.add('hidden');
-  workers = await fetch(API+'/workers').then(r=>r.json());
-  renderWorkers(); renderKpis();
-};
+      // KPI docs due in 30 days
+      let due = 0;
+      for(const w of workers){
+        for(const [key,_days] of Object.entries(EXPIRY_KEYS)){
+          const v = w.docs?.[key];
+          if(typeof v === 'string'){
+            if(daysUntil(v) <= 30) due++;
+          }
+        }
+      }
+      document.getElementById('kpiDue').textContent = due;
 
-btnNewSite.onclick = ()=> siteModal.classList.remove('hidden');
-closeSite.onclick = ()=> siteModal.classList.add('hidden');
-saveSite.onclick = async ()=>{
-  if(!s_name.value) return alert('Site name required');
-  await fetch(API+'/sites',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:s_name.value,address:s_address.value,client:s_client.value})});
-  siteModal.classList.add('hidden');
-  sites = await fetch(API+'/sites').then(r=>r.json());
-  renderSites(); renderKpis();
-};
+      // KPI non-compliant workers
+      const bad = workers.filter(w => !isQualified(w)).length;
+      document.getElementById('kpiBad').textContent = bad;
+    }
 
-/* ====== GO ====== */
-loadAll();
-</script>
+    /* ========= RENDER: SITES ========= */
+    function renderSites() {
+      const wrap = document.getElementById('sitesGrid');
+      if (!wrap) return;
+
+      wrap.innerHTML = (sites||[]).map(s => {
+        const period = (s.dates?.start && s.dates?.end)
+          ? `${s.dates.start} → ${s.dates.end}`
+          : '—';
+        return `
+          <div class="rounded-xl border border-slate-800 card p-4 hover:border-slate-700 transition">
+            <div class="text-xs text-slate-400 mb-1">${s.id}</div>
+            <div class="text-[17px] font-semibold text-slate-100">${s.name}</div>
+            <div class="text-sm text-slate-300 mt-1">${s.address || ''}</div>
+            <div class="text-sm text-slate-300 mt-2"><span class="text-slate-400">Client:</span> <b>${s.client || '—'}</b></div>
+            <div class="text-sm text-slate-300 mt-2"><span class="text-slate-400">Period:</span> ${period}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ========= RENDER: WORKERS ========= */
+    async function deleteWorker(id){
+      if(!confirm('Eliminare questo lavoratore?')) return;
+      await fetch(`${API}/workers/${id}`, { method:'DELETE' });
+      workers = await fetch(`${API}/workers`).then(r=>r.json());
+      renderWorkers();
+      renderDashboard();
+    }
+
+    async function onUploadDoc(workerId, file){
+      if(!file) return;
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch(`${API}/workers/${workerId}/docs`, { method:'POST', body: fd }).then(r=>r.json());
+      if(!r.ok){ alert('Upload/OCR fallito'); return; }
+
+      const map = {
+        'visita_medica':'visita_medica',
+        'formazione_generale':'corso_generale',
+        'formazione_specifica':'corso_specifica_fs',
+        'alto_rischio':'corso_alto_rischio',
+        'antincendio':'antincendio',
+        'primo_soccorso':'ps',
+        'dpi':'dpi_consegna',
+        'tesserino':'tesserino',
+        'preposto':'preposto',
+        'rls':'rls'
+      };
+      const key = map[r.extracted?.doc_type] || null;
+      const patch = key ? { docs: { [key]: r.extracted?.expiry_date || true } } : {};
+
+      await fetch(`${API}/workers/${workerId}`, {
+        method:'PATCH',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(patch)
+      });
+
+      workers = await fetch(`${API}/workers`).then(r=>r.json());
+      renderWorkers();
+      renderDashboard();
+    }
+
+    function renderWorkers() {
+      const host = document.getElementById('workersTable');
+      if (!host) return;
+
+      const rows = (workers||[]).map(w => {
+        const stato = isQualified(w) ? '<span class="text-emerald-400">Qualificato</span>' : '<span class="text-rose-400">Non qualificato</span>';
+        return `
+          <tr class="border-b border-slate-800 hover:bg-slate-900/30">
+            <td class="py-3">
+              <div class="text-sky-400 hover:underline cursor-pointer" title="${w.id}">${w.name}</div>
+              <div class="text-xs text-slate-400">${w.cf || ''}</div>
+            </td>
+            <td class="py-3">Dipendente</td>
+            <td class="py-3">${stato}</td>
+            <td class="py-3 text-center">${hasDoc(w,'preposto') ? iconTick : iconDash}</td>
+            <td class="py-3 text-center">${hasDoc(w,'antincendio') ? iconTick : iconDash}</td>
+            <td class="py-3 text-center">${hasDoc(w,'ps') ? iconTick : iconDash}</td>
+            <td class="py-3">
+              <span class="text-sm ${isQualified(w) ? 'text-emerald-400' : 'text-amber-300'}">${progressLabel(w)}</span>
+            </td>
+            <td class="py-3">
+              <button class="px-2 py-1 text-xs rounded bg-sky-600 hover:bg-sky-500 text-white">Richiedi Qualifica</button>
+            </td>
+            <td class="py-3">
+              <button class="px-2 py-1 text-xl text-slate-300 hover:text-white" title="Carica documento" onclick="document.getElementById('upload-${w.id}')?.click()">＋</button>
+              <input id="upload-${w.id}" type="file" class="hidden" onchange="onUploadDoc('${w.id}', this.files[0])">
+            </td>
+            <td class="py-3 text-center">
+              <button class="px-2 py-1 text-xl text-slate-300 hover:text-rose-400" title="Elimina" onclick="deleteWorker('${w.id}')">🗑</button>
+            </td>
+            <td class="py-3 text-center">
+              <button class="px-2 py-1 text-xl text-slate-300 hover:text-white" title="QR" onclick="alert('QR per ${w.id}')">▢</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      host.innerHTML = `
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="min-w-[900px] w-full">
+            <thead>
+              <tr class="bg-cyan-700 text-white text-sm">
+                <th class="text-left p-3">Lavoratore</th>
+                <th class="text-left p-3">Tipo</th>
+                <th class="text-left p-3">Stato</th>
+                <th class="p-3">Preposto</th>
+                <th class="p-3">Addetto Antincendio</th>
+                <th class="p-3">Addetto Primo Soccorso</th>
+                <th class="text-left p-3">Avanzamento caricamento documenti</th>
+                <th class="text-left p-3">Qualifica</th>
+                <th class="text-left p-3">Documenti</th>
+                <th class="text-left p-3">Elimina lavoratore</th>
+                <th class="text-left p-3">Qr lavoratore</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm text-slate-200">
+              ${rows || ''}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    /* ========= POS ========= */
+    function renderPosControls(){
+      const sel = document.getElementById('posSite');
+      sel.innerHTML = (sites||[]).map(s => `<option value="${s.id}">${s.id} — ${s.name}</option>`).join('');
+      sel.onchange = updatePosPreview;
+      updatePosPreview();
+    }
+
+    function updatePosPreview(){
+      const sel = document.getElementById('posSite');
+      const site = sites.find(s => s.id === sel.value) || sites[0];
+      if(!site) return;
+      const siteWorkers = (site.workers || []).map(id => workers.find(w => w.id === id)).filter(Boolean);
+
+      const preview =
+`POS – Piano Operativo di Sicurezza
+Site: ${site.name} — ${site.address}
+Client: ${site.client} — ${site.client_phone || ''}
+CSE: ${site.cse?.name || ''} — ${site.cse?.email || ''}
+Period: ${site.dates?.start || ''} → ${site.dates?.end || ''}
+
+Workers:
+${siteWorkers.map(w => `- ${w.name} (${w.role||'Operaio'})`).join('\n')}`;
+
+      document.getElementById('posPreview').value = preview;
+    }
+
+    async function onGeneratePOS(){
+      const sel = document.getElementById('posSite');
+      const site = sites.find(s => s.id === sel.value) || sites[0];
+      if(!site) return alert('Seleziona un cantiere');
+      const siteWorkers = (site.workers || []).map(id => workers.find(w => w.id === id)).filter(Boolean);
+
+      const r = await fetch(`${API}/pos`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ site, workers: siteWorkers })
+      }).then(r=>r.json()).catch(()=>({ok:false}));
+
+      const out = document.getElementById('posLink');
+      if(r.ok){
+        out.innerHTML = `<a href="${r.url}" target="_blank" class="text-sky-400 underline">Apri PDF generato</a>`;
+      } else {
+        out.textContent = 'Errore nella generazione del POS';
+      }
+    }
+
+    /* ========= OCR QUICK ========= */
+    async function onOCR(){
+      const workerId = document.getElementById('ocrWorker').value;
+      const file = document.getElementById('ocrFile').files[0];
+      const msg = document.getElementById('ocrMsg');
+      msg.textContent = '';
+      if(!workerId || !file){ msg.textContent = 'Seleziona lavoratore e file.'; return; }
+
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch(`${API}/workers/${workerId}/docs`, { method:'POST', body: fd }).then(r=>r.json());
+      if(!r.ok){ msg.textContent = 'Upload/OCR fallito'; return; }
+      msg.textContent = 'Documento caricato, aggiornamento in corso…';
+
+      const map = {
+        'visita_medica':'visita_medica',
+        'formazione_generale':'corso_generale',
+        'formazione_specifica':'corso_specifica_fs',
+        'alto_rischio':'corso_alto_rischio',
+        'antincendio':'antincendio',
+        'primo_soccorso':'ps',
+        'dpi':'dpi_consegna',
+        'tesserino':'tesserino',
+        'preposto':'preposto',
+        'rls':'rls'
+      };
+      const key = map[r.extracted?.doc_type] || null;
+      const patch = key ? { docs: { [key]: r.extracted?.expiry_date || true } } : {};
+
+      await fetch(`${API}/workers/${workerId}`, {
+        method:'PATCH',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(patch)
+      });
+
+      workers = await fetch(`${API}/workers`).then(r=>r.json());
+      renderWorkers();
+      renderDashboard();
+      msg.textContent = 'Aggiornato.';
+    }
+
+    /* ========= LOAD ========= */
+    async function boot(){
+      try{
+        company = await fetch(`${API}/company`).then(r=>r.json());
+        sites   = await fetch(`${API}/sites`).then(r=>r.json());
+        workers = await fetch(`${API}/workers`).then(r=>r.json());
+      }catch(e){
+        console.error(e);
+      }
+
+      // render
+      renderDashboard();
+      renderSites();
+      renderWorkers();
+      renderPosControls();
+
+      // OCR worker select
+      const wSel = document.getElementById('ocrWorker');
+      wSel.innerHTML = workers.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+
+      // events
+      document.getElementById('btnGenPOS').onclick = onGeneratePOS;
+      document.getElementById('btnOCR').onclick    = onOCR;
+    }
+
+    boot();
+  </script>
 </body>
 </html>
