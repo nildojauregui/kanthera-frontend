@@ -79,7 +79,7 @@
     <section id="upload">
       <h2 class="text-xl font-semibold">OCR Upload</h2>
       <div class="bg-[#0E1628] border border-slate-800 p-4 rounded-xl max-w-xl">
-        <input id="fileInput" type="file" class="w-full text-sm">
+        <input id="fileInput" type="file" class="w-full text-sm" accept=".pdf,.jpg,.jpeg,.png">
         <button id="btnUpload" class="mt-3 px-3 py-2 rounded bg-blue-500 text-white text-sm">Upload & OCR</button>
         <div id="uploadMsg" class="text-xs text-slate-400 mt-2"></div>
         <pre id="ocrOut" class="text-xs bg-[#0B1220] border border-slate-800 rounded p-3 whitespace-pre-wrap mt-3"></pre>
@@ -92,7 +92,12 @@
   </footer>
 
 <script>
-const API = 'https://kanthera-backend.onrender.com/api'; // <-- già corretto
+// 👉 Backend API (Render)
+const API = 'https://kanthera-backend.onrender.com/api';
+// Base URL del backend (senza /api) per costruire link assoluti
+const API_BASE = API.replace(/\/api$/, '');
+// Preferisci sempre url assoluto se presente, altrimenti costruiscilo
+const absUrl = (resp) => resp.url || (API_BASE + (resp.file || ''));
 
 const daysLeft = (s)=>{ const d=new Date(s), t=new Date(); return Math.floor((d-t)/(1000*60*60*24)); };
 const badge = (dateStr)=>{
@@ -104,8 +109,10 @@ const badge = (dateStr)=>{
   return '<span class="px-2 py-0.5 rounded-full text-xs bg-emerald-600 text-white">OK</span>';
 };
 
+let sites = [], workers = [];
+
 async function loadAll(){
-  const [sites, workers] = await Promise.all([
+  [sites, workers] = await Promise.all([
     fetch(API + '/sites').then(r=>r.json()),
     fetch(API + '/workers').then(r=>r.json())
   ]);
@@ -144,10 +151,10 @@ async function loadAll(){
     </div>`).join('');
 
   // POS
-  const siteSel = document.getElementById('siteSelect');
-  siteSel.innerHTML = sites.map(s=>`<option value="${s.id}">${s.id} — ${s.name}</option>`).join('');
+  const siteSelect = document.getElementById('siteSelect');
+  siteSelect.innerHTML = sites.map(s=>`<option value="${s.id}">${s.id} — ${s.name}</option>`).join('');
   function updatePreview(){
-    const sid = siteSel.value || sites[0]?.id;
+    const sid = siteSelect.value || sites[0]?.id;
     const s = sites.find(x=>x.id===sid) || sites[0];
     const ws = workers.filter(w=>s.workers.includes(w.id));
     const lines = [];
@@ -161,15 +168,27 @@ async function loadAll(){
     ws.forEach(w=>lines.push(' - '+w.name+' ('+w.role+') • Course: '+(w.docs?.corso||'N/A')+' • Checkup: '+(w.docs?.visita||'N/A')));
     document.getElementById('posPreview').textContent = lines.join('\n');
   }
-  siteSel.onchange = updatePreview; updatePreview();
+  siteSelect.onchange = updatePreview; updatePreview();
 
   document.getElementById('btnGen').onclick = async ()=>{
-    const sid = siteSel.value || sites[0]?.id;
+    const sid = siteSelect.value || sites[0]?.id;
     const s = sites.find(x=>x.id===sid) || sites[0];
     const ws = workers.filter(w=>s.workers.includes(w.id));
     const payload = { site:s, workers:ws, vars:{ activities:'—', risks:'—', measures:'—' } };
-    const r = await fetch(API+'/pos',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }).then(r=>r.json());
-    document.getElementById('msg').textContent = r.ok ? ('PDF generated: '+r.file) : 'Error generating PDF';
+
+    const r = await fetch(API + '/pos', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    }).then(x=>x.json());
+
+    const msg = document.getElementById('msg');
+    if (r.ok) {
+      const url = absUrl(r);
+      msg.innerHTML = `PDF generated: <a class="underline hover:no-underline text-blue-400" href="${url}" target="_blank" rel="noopener">open POS</a>`;
+    } else {
+      msg.textContent = 'Error generating PDF';
+    }
   };
 
   // OCR
@@ -178,11 +197,15 @@ async function loadAll(){
     if(!f){ document.getElementById('uploadMsg').textContent = 'Please choose a file'; return; }
     const fd = new FormData(); fd.append('file', f);
     document.getElementById('uploadMsg').textContent = 'Uploading…';
-    const r = await fetch(API+'/upload', { method:'POST', body:fd }).then(r=>r.json());
-    document.getElementById('uploadMsg').textContent = r.ok ? ('Uploaded: '+r.file) : 'Error';
+    const r = await fetch(API + '/upload', { method:'POST', body:fd }).then(x=>x.json());
+    const url = r.ok ? absUrl(r) : null;
+    document.getElementById('uploadMsg').innerHTML = r.ok
+      ? `Uploaded: <a class="underline hover:no-underline text-blue-400" href="${url}" target="_blank" rel="noopener">${r.file}</a>`
+      : 'Error';
     document.getElementById('ocrOut').textContent = r.ocr || '';
   };
 }
+
 loadAll();
 </script>
 </body>
