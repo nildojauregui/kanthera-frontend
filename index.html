@@ -153,47 +153,85 @@ function renderKpis(){
 /* ====== SITES UI ====== */
 function renderSites(){
   const c = document.getElementById('sites');
-  if(!sites.length){ c.innerHTML = '<div class="text-slate-400 text-sm">No sites yet.</div>'; }
-  else {
-    c.innerHTML = sites.map(s=>`
-      <div class="card">
-        <div class="font-semibold">${s.name}</div>
-        <div class="text-xs text-slate-400">${s.address||''}</div>
-        <div class="text-xs text-slate-500">${s.client||''}</div>
-      </div>
-    `).join('');
+
+  if (!sites.length) {
+    c.innerHTML = '<div class="text-slate-400 text-sm">No sites yet.</div>';
+    siteSelect.innerHTML = '';
+    posPreview.value = '';
+    return;
   }
+
+  c.classList.add("grid","grid-cols-1","md:grid-cols-2","gap-4"); // layout cards
+
+  c.innerHTML = sites.map(s => {
+    const id = s.id || "";
+    const name = s.name || "";
+    const address = s.address || "";
+    const client = s.client || "";
+    const start = s.dates?.start || "";
+    const end = s.dates?.end || "";
+
+    return `
+      <div class="card hover:border-slate-600 transition">
+        <div class="text-[11px] text-slate-400 mb-1">${id}</div>
+        <div class="font-semibold mb-1">${name}</div>
+        ${address ? `<div class="text-[13px] text-slate-300 mb-1">${address}</div>` : ""}
+        ${client ? `<div class="text-[13px] mb-1">Client: <span class="font-semibold">${client}</span></div>` : ""}
+        ${(start || end) ? `<div class="text-[13px] text-slate-300">Period: ${start||"—"} → ${end||"—"}</div>` : ""}
+      </div>
+    `;
+  }).join("");
+
+  // select POS
   siteSelect.innerHTML = sites.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
-  posPreview.value = sites[0] ? `${sites[0].name} — ${sites[0].client||''}` : '';
+  const first = sites[0];
+  posPreview.value = first ? `${first.name} — ${first.client || ''}` : '';
 }
+
 
 /* ====== WORKERS UI ====== */
 function renderWorkers(){
   const el = document.getElementById('workers');
+
+  if (!workers.length) {
+    el.innerHTML = `<div class="text-slate-400 text-sm">No workers yet.</div>`;
+    return;
+  }
+
   el.innerHTML = `
-  <table class="min-w-full text-sm">
-    <thead class="bg-slate-800 text-slate-300">
-      <tr>
-        <th class="text-left">Name</th>
-        <th>CF</th>
-        <th>Role</th>
-        <th>Upload Doc (OCR)</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${workers.map(w=>`
-        <tr class="border-t border-slate-700">
-          <td class="text-left">${w.name}</td>
-          <td>${w.cf||''}</td>
-          <td>${w.role||''}</td>
-          <td>
-            <input type="file" class="fileinput text-xs" style="width:60%">
-            <button data-w="${w.id}" class="uploadBtn btn text-xs ml-1 text-white">Upload</button>
-          </td>
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-800 text-slate-300">
+        <tr>
+          <th class="text-left">Name</th>
+          <th class="text-left">CF</th>
+          <th class="text-left">Role</th>
+          <th class="text-left">Status</th>
+          <th class="text-left">Upload Doc (OCR)</th>
         </tr>
-      `).join('')}
-    </tbody>
-  </table>`;
+      </thead>
+      <tbody>
+        ${workers.map(w => {
+          const status = (w.docs && Object.values(w.docs).some(Boolean)) ? 
+            '<span class="text-green-400">Docs on file</span>' : 
+            '<span class="text-slate-400">—</span>';
+
+          return `
+            <tr class="border-t border-slate-700">
+              <td class="text-left">${w.name}</td>
+              <td class="text-left">${w.cf || ''}</td>
+              <td class="text-left">${w.role || ''}</td>
+              <td class="text-left">${status}</td>
+              <td class="text-left">
+                <input type="file" class="fileinput text-xs" style="width:60%">
+                <button data-w="${w.id}" class="uploadBtn btn text-xs ml-1 text-white">Upload</button>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+
   attachUploadHandlers();
 }
 
