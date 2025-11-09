@@ -1,83 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kanthera — V1.2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KANTHERA — Unified UI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      background-color: #0B1220;
-      color: #E5E7EB;
-      font-family: 'Inter', sans-serif;
-    }
-    .card {
-      background: #0E1628;
-      border: 1px solid #1E293B;
-      border-radius: 1rem;
-      padding: 1rem;
-      box-shadow: 0 0 10px #0002;
-    }
-    .btn {
-      background-color: #2563EB;
-      color: white;
-      font-size: 0.875rem;
-      font-weight: 500;
-      border-radius: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      cursor: pointer;
-    }
-    .btn:hover { background-color: #1D4ED8; }
-    input, select {
-      background: #0B1220;
-      border: 1px solid #334155;
-      border-radius: 0.375rem;
-      padding: 0.4rem;
-      width: 100%;
-      color: #E5E7EB;
-    }
+    body{background:#0B1220;color:#E5E7EB;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto}
+    .card{background:#0E1628;border:1px solid #1E293B;border-radius:1rem;padding:1rem}
+    .btn{background:#3B82F6;border-radius:.5rem;padding:.5rem .75rem}
+    .btn:hover{background:#2563EB}
+    input,select,textarea{background:#0B1220;border:1px solid #334155;border-radius:.375rem;padding:.45rem .6rem;width:100%}
+    th,td{padding:.5rem .6rem}
   </style>
 </head>
-<body class="p-4">
-  <header class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-blue-400">Kanthera</h1>
-    <p class="text-sm text-slate-400 italic">Tu costruisci. Noi semplifichiamo.</p>
+<body class="p-4 max-w-6xl mx-auto">
+
+  <!-- HEADER -->
+  <header class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-blue-500 grid place-content-center font-bold">K</div>
+      <div>
+        <div class="font-bold text-lg">KANTHERA</div>
+        <div class="text-xs text-slate-400">Tu costruisci. Noi semplifichiamo.</div>
+      </div>
+    </div>
   </header>
 
-  <main class="grid gap-6">
-    <!-- DASHBOARD -->
-    <section class="card">
-      <h2 class="text-lg font-semibold mb-2">CANTIERI</h2>
-      <div id="sites" class="grid gap-2"></div>
-      <button id="btnNewSite" class="btn mt-3">+ Nuovo Cantiere</button>
-    </section>
+  <!-- DASHBOARD CARDS -->
+  <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="card">
+      <div class="text-slate-400 text-sm">Active sites</div>
+      <div id="kpi_active" class="text-2xl mt-2">—</div>
+    </div>
+    <div class="card">
+      <div class="text-slate-400 text-sm">Docs due in 30 days</div>
+      <div id="kpi_due" class="text-2xl mt-2">—</div>
+    </div>
+    <div class="card">
+      <div class="text-slate-400 text-sm">Non-compliant workers</div>
+      <div id="kpi_nc" class="text-2xl mt-2">—</div>
+    </div>
+  </section>
 
-    <!-- WORKERS -->
-    <section class="card">
-      <h2 class="text-lg font-semibold mb-2">LAVORATORI</h2>
-      <div id="workers" class="overflow-x-auto"></div>
-      <button id="btnNewWorker" class="btn mt-3">+ Nuovo Lavoratore</button>
-    </section>
+  <!-- SITES -->
+  <section class="mb-8">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="font-semibold text-lg">Sites</h2>
+      <button id="btnNewSite" class="btn text-white text-sm">+ New Site</button>
+    </div>
+    <div id="sites" class="grid gap-3"></div>
+  </section>
 
-    <!-- POS -->
-    <section class="card">
-      <h2 class="text-lg font-semibold mb-2">POS Generator</h2>
-      <select id="siteSelect" class="mb-2"></select>
-      <button id="btnGen" class="btn">Genera POS</button>
-      <p id="msg" class="text-sm mt-2 text-slate-400"></p>
-    </section>
-  </main>
+  <!-- WORKERS -->
+  <section class="mb-8">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="font-semibold text-lg">Workers</h2>
+      <button id="btnNewWorker" class="btn text-white text-sm">+ New Worker</button>
+    </div>
+    <div id="workers" class="card overflow-x-auto">
+      <!-- table rendered here -->
+    </div>
+  </section>
+
+  <!-- POS + OCR -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="card lg:col-span-2">
+      <h3 class="font-semibold mb-3">POS Composer</h3>
+      <label class="text-sm text-slate-300 mb-1 block">Choose site:</label>
+      <select id="siteSelect"></select>
+      <label class="text-sm text-slate-300 mt-4 mb-1 block">Preview</label>
+      <input id="posPreview" disabled placeholder="Select a site to preview..." />
+    </div>
+    <div class="card">
+      <h3 class="font-semibold mb-3">Actions</h3>
+      <button id="btnGen" class="btn w-full text-white">Generate POS (PDF)</button>
+      <p id="msg" class="text-sm text-slate-400 mt-3"></p>
+    </div>
+  </section>
+
+  <section class="card mt-6">
+    <h3 class="font-semibold mb-3">OCR Upload (quick test)</h3>
+    <input type="file" id="ocrFile" class="mb-2"/>
+    <button id="ocrBtn" class="btn text-white">Upload & OCR</button>
+    <div id="ocrRes" class="text-sm text-slate-400 mt-3"></div>
+  </section>
 
   <!-- NEW WORKER MODAL -->
   <div id="workerModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-[#0E1628] p-6 rounded-xl w-full max-w-sm border border-slate-800">
-      <h3 class="text-lg font-semibold mb-4">Nuovo Lavoratore</h3>
-      <input id="m_name" placeholder="Nome e Cognome" class="mb-2">
-      <input id="m_cf" placeholder="Codice Fiscale" class="mb-2">
-      <input id="m_role" placeholder="Ruolo" class="mb-4">
+      <h3 class="text-lg font-semibold mb-4">New Worker</h3>
+      <input id="m_name" placeholder="Full name" class="mb-2">
+      <input id="m_cf" placeholder="Tax code (CF)" class="mb-2">
+      <input id="m_role" placeholder="Role" class="mb-4">
       <div class="flex justify-end gap-2">
-        <button id="closeModal" class="px-3 py-1 bg-slate-600 rounded text-sm">Annulla</button>
-        <button id="saveWorker" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Crea</button>
+        <button id="closeWorker" class="px-3 py-1 bg-slate-600 rounded text-sm">Cancel</button>
+        <button id="saveWorker" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Create</button>
       </div>
     </div>
   </div>
@@ -85,13 +103,13 @@
   <!-- NEW SITE MODAL -->
   <div id="siteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
     <div class="bg-[#0E1628] p-6 rounded-xl w-full max-w-sm border border-slate-800">
-      <h3 class="text-lg font-semibold mb-4">Nuovo Cantiere</h3>
-      <input id="s_name" placeholder="Nome cantiere" class="mb-2">
-      <input id="s_address" placeholder="Indirizzo" class="mb-2">
-      <input id="s_client" placeholder="Committente" class="mb-2">
+      <h3 class="text-lg font-semibold mb-4">New Site</h3>
+      <input id="s_name" placeholder="Site name" class="mb-2">
+      <input id="s_address" placeholder="Address" class="mb-2">
+      <input id="s_client" placeholder="Client" class="mb-4">
       <div class="flex justify-end gap-2">
-        <button id="closeSite" class="px-3 py-1 bg-slate-600 rounded text-sm">Annulla</button>
-        <button id="saveSite" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Crea</button>
+        <button id="closeSite" class="px-3 py-1 bg-slate-600 rounded text-sm">Cancel</button>
+        <button id="saveSite" class="px-3 py-1 bg-blue-500 rounded text-sm text-white">Create</button>
       </div>
     </div>
   </div>
@@ -108,137 +126,166 @@
     </div>
   </div>
 
-  <script>
-  const API = 'https://kanthera-backend.onrender.com/api';
-  const API_BASE = API.replace(/\/api$/, '');
-  const absUrl = (r) => r.url || (API_BASE + r.file);
+<script>
+/* ====== CONFIG ====== */
+const API = 'https://kanthera-backend.onrender.com/api'; // <-- cambia se il tuo backend ha un altro URL
+const API_BASE = API.replace(/\/api$/, '');
+const absUrl = (r) => r.url || (API_BASE + r.file);
 
-  let workers = [], sites = [];
+let workers = [], sites = [];
 
-  async function loadAll() {
-    [workers, sites] = await Promise.all([
-      fetch(API + '/workers').then(r=>r.json()),
-      fetch(API + '/sites').then(r=>r.json())
-    ]);
-    renderSites(); renderWorkersTable();
-  }
+/* ====== LOAD ====== */
+async function loadAll(){
+  const [ws, ss] = await Promise.all([
+    fetch(API+'/workers').then(r=>r.json()),
+    fetch(API+'/sites').then(r=>r.json())
+  ]);
+  workers = ws; sites = ss;
+  renderSites(); renderWorkers(); renderKpis();
+}
+function renderKpis(){
+  kpi_active.textContent = sites.length;
+  // placeholder KPI: docs due & non-compliant
+  kpi_due.textContent = workers.filter(w=>w?.docs?.visita || w?.docs?.corso).length;
+  kpi_nc.textContent = workers.filter(w=>!w?.docs || Object.values(w.docs).every(v=>!v)).length;
+}
 
-  function renderSites() {
-    sitesDiv.innerHTML = sites.map(s=>`
-      <div class="border border-slate-700 rounded p-2">
+/* ====== SITES UI ====== */
+function renderSites(){
+  const c = document.getElementById('sites');
+  if(!sites.length){ c.innerHTML = '<div class="text-slate-400 text-sm">No sites yet.</div>'; }
+  else {
+    c.innerHTML = sites.map(s=>`
+      <div class="card">
         <div class="font-semibold">${s.name}</div>
         <div class="text-xs text-slate-400">${s.address||''}</div>
         <div class="text-xs text-slate-500">${s.client||''}</div>
-      </div>`).join('');
-    siteSelect.innerHTML = sites.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+      </div>
+    `).join('');
   }
+  siteSelect.innerHTML = sites.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  posPreview.value = sites[0] ? `${sites[0].name} — ${sites[0].client||''}` : '';
+}
 
-  function renderWorkersTable() {
-    workersDiv.innerHTML = `
-    <table class="min-w-full text-sm border border-slate-700 rounded">
-      <thead class="bg-slate-800 text-slate-300">
-        <tr><th class="p-2 text-left">Nome</th><th class="p-2">CF</th><th class="p-2">Ruolo</th><th class="p-2">Upload Doc</th></tr>
-      </thead>
-      <tbody>${workers.map(w=>`
+/* ====== WORKERS UI ====== */
+function renderWorkers(){
+  const el = document.getElementById('workers');
+  el.innerHTML = `
+  <table class="min-w-full text-sm">
+    <thead class="bg-slate-800 text-slate-300">
+      <tr>
+        <th class="text-left">Name</th>
+        <th>CF</th>
+        <th>Role</th>
+        <th>Upload Doc (OCR)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${workers.map(w=>`
         <tr class="border-t border-slate-700">
-          <td class="p-2">${w.name}</td>
-          <td class="p-2">${w.cf}</td>
-          <td class="p-2">${w.role||''}</td>
-          <td class="p-2">
-            <input type="file" class="fileinput text-xs" style="width: 60%">
-            <button data-w="${w.id}" class="uploadBtn btn text-xs ml-1">Upload</button>
+          <td class="text-left">${w.name}</td>
+          <td>${w.cf||''}</td>
+          <td>${w.role||''}</td>
+          <td>
+            <input type="file" class="fileinput text-xs" style="width:60%">
+            <button data-w="${w.id}" class="uploadBtn btn text-xs ml-1 text-white">Upload</button>
           </td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
-    attachUploadHandlers();
-  }
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>`;
+  attachUploadHandlers();
+}
 
-  function attachUploadHandlers(){
-    document.querySelectorAll('.uploadBtn').forEach(btn=>{
-      btn.onclick = async ()=>{
-        const id = btn.dataset.w;
-        const f = btn.parentElement.querySelector('.fileinput').files?.[0];
-        if(!f){ alert('Choose a file'); return; }
-        const fd = new FormData(); fd.append('file', f);
-        btn.disabled = true; btn.textContent = 'Uploading...';
-        try {
-          const r = await fetch(`${API}/workers/${id}/docs`, { method:'POST', body:fd }).then(x=>x.json());
-          if(!r.ok) throw new Error(r.error || 'Upload error');
-          const e = r.extracted || {};
-          const html = `
-            <table class="w-full text-left text-xs border-collapse">
-              <tr><td class="text-slate-400 pr-2">Doc type:</td><td>${e.doc_type||'—'}</td></tr>
-              <tr><td class="text-slate-400 pr-2">Holder:</td><td>${e.holder_name||'—'}</td></tr>
-              <tr><td class="text-slate-400 pr-2">CF:</td><td>${e.cf||'—'}</td></tr>
-              <tr><td class="text-slate-400 pr-2">Issue:</td><td>${e.issue_date||'—'}</td></tr>
-              <tr><td class="text-slate-400 pr-2">Expiry:</td><td>${e.expiry_date||'—'}</td></tr>
-              <tr><td class="text-slate-400 pr-2">Confidence:</td><td>${Math.round((r.confidence||0)*100)}%</td></tr>
-            </table>`;
-          ai_table.innerHTML = html;
-          modalAI.classList.remove('hidden');
-          ai_cancel.onclick = ()=> modalAI.classList.add('hidden');
-          ai_save.onclick = async ()=>{
-            const patch = {
-              docs: { 
-                corso: e.doc_type?.includes('formazione') ? e.expiry_date : null,
-                visita: e.doc_type?.includes('visita') ? e.expiry_date : null
-              }
-            };
-            await fetch(`${API}/workers/${id}`, {
-              method:'PATCH',
-              headers:{'Content-Type':'application/json'},
-              body:JSON.stringify(patch)
-            });
-            modalAI.classList.add('hidden');
-            workers = await fetch(API + '/workers').then(x=>x.json());
-            renderWorkersTable();
+function attachUploadHandlers(){
+  document.querySelectorAll('.uploadBtn').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const id = btn.dataset.w;
+      const f = btn.parentElement.querySelector('.fileinput').files?.[0];
+      if(!f) return alert('Choose a file');
+      const fd = new FormData(); fd.append('file', f);
+      btn.disabled = true; btn.textContent = 'Uploading...';
+      try{
+        const r = await fetch(`${API}/workers/${id}/docs`,{method:'POST',body:fd}).then(x=>x.json());
+        if(!r.ok) throw new Error(r.error || 'Upload error');
+        // AI modal
+        const e = r.extracted || {};
+        ai_table.innerHTML = `
+          <table class="w-full text-left text-xs">
+            <tr><td class="text-slate-400 pr-2">Doc type:</td><td>${e.doc_type||'—'}</td></tr>
+            <tr><td class="text-slate-400 pr-2">Holder:</td><td>${e.holder_name||'—'}</td></tr>
+            <tr><td class="text-slate-400 pr-2">CF:</td><td>${e.cf||'—'}</td></tr>
+            <tr><td class="text-slate-400 pr-2">Issue:</td><td>${e.issue_date||'—'}</td></tr>
+            <tr><td class="text-slate-400 pr-2">Expiry:</td><td>${e.expiry_date||'—'}</td></tr>
+            <tr><td class="text-slate-400 pr-2">Confidence:</td><td>${Math.round((r.confidence||0)*100)}%</td></tr>
+          </table>`;
+        modalAI.classList.remove('hidden');
+        ai_cancel.onclick = ()=> modalAI.classList.add('hidden');
+        ai_save.onclick = async ()=>{
+          const patch = {
+            docs: {
+              corso: e.doc_type?.includes('formazione') ? e.expiry_date : null,
+              visita: e.doc_type?.includes('visita') ? e.expiry_date : null
+            }
           };
-        } catch(e){ alert(e.message); }
-        finally { btn.disabled=false; btn.textContent='Upload'; }
-      };
-    });
-  }
+          await fetch(`${API}/workers/${id}`,{
+            method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)
+          });
+          modalAI.classList.add('hidden');
+          workers = await fetch(API+'/workers').then(r=>r.json());
+          renderWorkers(); renderKpis();
+        };
+      }catch(err){ alert(err.message); }
+      finally{ btn.disabled=false; btn.textContent='Upload'; }
+    };
+  });
+}
 
-  // New Worker modal
-  btnNewWorker.onclick = ()=> workerModal.classList.remove('hidden');
-  closeModal.onclick = ()=> workerModal.classList.add('hidden');
-  saveWorker.onclick = async ()=>{
-    await fetch(API+'/workers',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ name:m_name.value, cf:m_cf.value, role:m_role.value })});
-    workerModal.classList.add('hidden');
-    workers = await fetch(API+'/workers').then(r=>r.json());
-    renderWorkersTable();
-  };
+/* ====== POS ====== */
+btnGen.onclick = async ()=>{
+  const sid = siteSelect.value || sites[0]?.id;
+  const s = sites.find(x=>x.id===sid) || sites[0];
+  const ws = workers.filter(w=>s?.workers?.includes(w.id));
+  const payload = { site:s, workers:ws, vars:{} };
+  const r = await fetch(API+'/pos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(x=>x.json());
+  msg.innerHTML = r.ok ? `PDF generated: <a class="underline" target="_blank" href="${absUrl(r)}">open</a>` : 'Error';
+};
 
-  // New Site modal
-  btnNewSite.onclick = ()=> siteModal.classList.remove('hidden');
-  closeSite.onclick = ()=> siteModal.classList.add('hidden');
-  saveSite.onclick = async ()=>{
-    await fetch(API+'/sites',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ name:s_name.value, address:s_address.value, client:s_client.value })});
-    siteModal.classList.add('hidden');
-    sites = await fetch(API+'/sites').then(r=>r.json());
-    renderSites();
-  };
+/* ====== OCR QUICK TEST (no worker link) ====== */
+ocrBtn.onclick = async ()=>{
+  const f = ocrFile.files?.[0]; if(!f) return alert('Pick a file');
+  const fd = new FormData(); fd.append('file', f);
+  // usa il primo worker esistente per test
+  const id = workers[0]?.id; if(!id) return alert('Create a worker first');
+  const r = await fetch(`${API}/workers/${id}/docs`,{method:'POST',body:fd}).then(x=>x.json());
+  ocrRes.textContent = r.ok ? JSON.stringify(r.extracted, null, 2) : 'Error';
+};
 
-  // POS generation
-  btnGen.onclick = async ()=>{
-    const sid = siteSelect.value || sites[0]?.id;
-    const s = sites.find(x=>x.id===sid) || sites[0];
-    const ws = workers.filter(w=>s.workers?.includes(w.id));
-    const payload = { site:s, workers:ws, vars:{ activities:'—', risks:'—', measures:'—' } };
-    const r = await fetch(API + '/pos', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    }).then(x=>x.json());
-    msg.innerHTML = r.ok ? `PDF generated: <a href="${absUrl(r)}" target="_blank">open POS</a>` : 'Error';
-  };
+/* ====== MODALS ====== */
+btnNewWorker.onclick = ()=> workerModal.classList.remove('hidden');
+closeWorker.onclick = ()=> workerModal.classList.add('hidden');
+saveWorker.onclick = async ()=>{
+  if(!m_name.value || !m_cf.value) return alert('Name & CF are required');
+  await fetch(API+'/workers',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:m_name.value, cf:m_cf.value, role:m_role.value})});
+  workerModal.classList.add('hidden');
+  workers = await fetch(API+'/workers').then(r=>r.json());
+  renderWorkers(); renderKpis();
+};
 
-  const sitesDiv = document.getElementById('sites');
-  const workersDiv = document.getElementById('workers');
-  loadAll();
-  </script>
+btnNewSite.onclick = ()=> siteModal.classList.remove('hidden');
+closeSite.onclick = ()=> siteModal.classList.add('hidden');
+saveSite.onclick = async ()=>{
+  if(!s_name.value) return alert('Site name required');
+  await fetch(API+'/sites',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:s_name.value,address:s_address.value,client:s_client.value})});
+  siteModal.classList.add('hidden');
+  sites = await fetch(API+'/sites').then(r=>r.json());
+  renderSites(); renderKpis();
+};
+
+/* ====== GO ====== */
+loadAll();
+</script>
 </body>
 </html>
