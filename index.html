@@ -1,571 +1,587 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KANTHERA — Router MVP</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { background:#0B1222; color:#D8E0F0; }
-    .card { background:#0E1628; border:1px solid #101B33; }
-    .brand-k { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#3B82F6; color:white; font-weight:800; }
-    .muted { color:#96A2BE; }
-    .tab { padding:8px 12px; border-radius:8px; }
-    .tab.active { background:#13203b; color:#fff; }
-    a.nav { opacity:.85; }
-    a.nav:hover { opacity:1; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>KANTHERA</title>
+<style>
+  :root{
+    --bg:#0b1220;           /* slate-950-ish */
+    --card:#0f172a;         /* slate-900 */
+    --muted:#94a3b8;        /* slate-400 */
+    --text:#e2e8f0;         /* slate-200 */
+    --line:rgba(255,255,255,.08);
+    --line2:rgba(255,255,255,.06);
+    --blue:#60a5fa;         /* blue-400 */
+    --blue-12:rgba(59,130,246,.12);
+    --blue-22:rgba(59,130,246,.22);
+    --green:#10b981;        /* emerald-500 */
+    --red:#ef4444;          /* red-500 */
+    --amber:#f59e0b;        /* amber-500 */
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+  }
+  a{color:var(--blue);text-decoration:none}
+  .container{max-width:1100px;margin:0 auto;padding:24px}
+  /* Topbar */
+  .topbar{
+    position:sticky;top:0;z-index:9;
+    background:rgba(11,18,32,.85);backdrop-filter:saturate(120%) blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 16px;
+  }
+  .nav{display:flex;align-items:center;gap:18px;max-width:1100px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+  .logo{
+    display:grid;place-items:center;width:28px;height:28px;border-radius:8px;
+    color:#fff;background:#3b82f6;font-weight:800;
+  }
+  .nav a{color:#cbd5e1}
+  .nav a.active{color:#fff;font-weight:700}
+  .spacer{flex:1}
+  .slogan{color:#cbd5e1;font-size:12px}
+
+  /* Buttons / inputs */
+  .btn{display:inline-flex;align-items:center;gap:8px;background:#3b82f6;color:#00122b;padding:9px 12px;border:none;border-radius:10px;font-weight:700;cursor:pointer}
+  .btn:hover{filter:brightness(1.05)}
+  .btn-outline{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);color:#cbd5e1;background:transparent;padding:9px 12px;border-radius:10px}
+  .btn-outline:hover{border-color:var(--blue);color:#fff}
+  input,select,textarea{
+    width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line2);border-radius:10px;color:var(--text);
+    padding:10px 12px;outline:none
+  }
+  label{color:#cbd5e1;font-size:12px;margin-bottom:6px;display:block}
+
+  /* Sections / cards */
+  .section{margin:20px 0}
+  .section h3{margin:0 0 12px 0}
+  .grid{display:grid;gap:14px}
+  .grid.cards{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+  .card{
+    background:var(--card);border:1px solid var(--line2);border-radius:14px;padding:16px;transition:120ms ease;
+  }
+  .card:hover{border-color:var(--line);transform:translateY(-1px)}
+  .kpi{display:grid;gap:6px;background:var(--card);border:1px solid var(--line2);border-radius:14px;padding:16px}
+  .kpi .label{color:#cbd5e1}
+  .muted{color:var(--muted)}
+  .flex{display:flex;gap:10px;align-items:center}
+  .flex-sb{display:flex;gap:10px;align-items:center;justify-content:space-between}
+
+  /* Tabs + workers table (site detail) */
+  .section-surface {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .tabs { display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:12px }
+  .tab { padding:8px 14px;border-radius:8px 8px 0 0;color:#cbd5e1;cursor:pointer;background:transparent;border:1px solid transparent }
+  .tab:hover { color:#fff;background:rgba(255,255,255,.04) }
+  .tab.active { color:#fff;background:var(--blue-12);border-color:var(--blue-22);border-bottom-color:transparent }
+
+  .table{width:100%;border-collapse:collapse;font-size:14px}
+  .table thead th{ text-align:left;color:#cbd5e1;padding:10px 12px;background:rgba(255,255,255,.04);border-bottom:1px solid var(--line) }
+  .table tbody td{ padding:12px;border-bottom:1px solid var(--line2);color:var(--text) }
+  .muted-small{ color:var(--muted); font-size:12px;margin-top:3px }
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;letter-spacing:.2px;border:1px solid transparent}
+  .badge.ok{color:var(--green);background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.22)}
+  .badge.fail{color:var(--red);background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.22)}
+  .progress-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:12px;color:#93c5fd;background:var(--blue-12);border:1px solid var(--blue-22)}
+  .check-dot{ width:18px;height:18px;display:grid;place-items:center;border-radius:999px;border:1px solid var(--line2);color:#a3e635 }
+  .check-dot.ok{ border-color:rgba(163,230,53,.35); background:rgba(163,230,53,.12) }
+
+  .add-row{display:flex;gap:10px;align-items:center;margin-top:12px}
+  .divider{height:1px;background:var(--line);margin:14px 0}
+
+  /* small helpers */
+  .caps{font-size:12px;letter-spacing:.4px;color:#cbd5e1}
+</style>
 </head>
-<body class="min-h-screen">
+<body>
 
-  <!-- NAV -->
-  <header class="border-b border-slate-800/60 sticky top-0 z-40 bg-[#0B1222]/90 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span class="brand-k">K</span>
-        <div class="leading-4">
-          <div class="font-semibold">KANTHERA</div>
-          <div class="muted text-xs">Tu costruisci. Noi semplifichiamo.</div>
-        </div>
+<header class="topbar">
+  <nav class="nav">
+    <div class="brand">
+      <div class="logo">K</div>
+      <div>
+        <div style="font-weight:800">KANTHERA</div>
+        <div class="slogan">Tu costruisci. Noi semplifichiamo.</div>
       </div>
-      <nav class="flex items-center gap-6 text-sm">
-        <a href="#/dashboard" class="nav">Dashboard</a>
-        <a href="#/sites" class="nav">Sites</a>
-        <a href="#/workers" class="nav">Workers</a>
-        <a href="#/deadlines" class="nav">Deadlines</a>
-        <a href="#/settings" class="nav">Settings</a>
-      </nav>
     </div>
-  </header>
+    <a href="#/dashboard" id="nav-dash">Dashboard</a>
+    <a href="#/sites" id="nav-sites">Sites</a>
+    <a href="#/workers" id="nav-workers">Workers</a>
+    <a href="#/settings" id="nav-settings">Settings</a>
+    <div class="spacer"></div>
+  </nav>
+</header>
 
-  <!-- APP ROOT -->
-  <main id="app" class="max-w-6xl mx-auto px-4 py-8"></main>
+<main class="container">
+  <div id="app"></div>
+</main>
 
 <script>
-/* ========= CONFIG ========= */
-// 🔧 Sostituisci con il tuo backend Render:
-const API = 'https://kanthera-backend.onrender.com/api';
+/* ==========================================================
+ *  CONFIG
+ *  Aggiorna con il tuo backend:
+ * ========================================================== */
+const API = 'https://kanthera-backend.onrender.com/api'; // <-- CAMBIA QUI se serve
 
-/* ========= STATE ========= */
-let company = {};
-let sites   = [];
-let workers = [];
-let recentUploads = []; // in-memory MVP (aggiornato da OCR)
-
-/* ========= UTILS ========= */
-const REQUIRED_FOR_QUALIFIED = ['visita_medica','corso_generale','corso_specifica_fs','dpi_consegna','tesserino'];
-const EXPIRY_KEYS = {
-  visita_medica:      365,
-  corso_generale:     365*5,
-  corso_specifica_fs: 365*5,
-  antincendio:        365*3,
-  ps:                 365*3
+/* ==========================================================
+ *  STATE
+ * ========================================================== */
+let STATE = {
+  company: null,
+  sites:   [],
+  workers: [],
 };
-function hasDoc(w, key){ const v=w?.docs?.[key]; return v===true || (typeof v==='string' && v.length>=4); }
-function isQualified(w){ return REQUIRED_FOR_QUALIFIED.every(k=>hasDoc(w,k)); }
-function progressLabel(w){ const have=REQUIRED_FOR_QUALIFIED.filter(k=>hasDoc(w,k)).length; return have===REQUIRED_FOR_QUALIFIED.length?'Documentazione completata':'Documentazione da completare'; }
-function fmtDate(d){ if(!d) return ''; const x=new Date(d); return isNaN(x)?d:x.toISOString().slice(0,10); }
-function daysUntil(dateStr){ if(!dateStr) return Infinity; const d=new Date(dateStr); if(isNaN(d)) return Infinity; return Math.floor((d - new Date())/86400000); }
-function byId(id){ return document.getElementById(id); }
-function q(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
-const iconTick = '<span class="text-green-500">✔</span>';
-const iconDash = '<span class="text-slate-400">—</span>';
 
-/* ========= ROUTER ========= */
-window.addEventListener('hashchange', renderRoute);
-window.addEventListener('load', async () => {
-  await boot();
-  if(!location.hash) location.hash = '#/dashboard';
-  renderRoute();
-});
+/* ==========================================================
+ *  UTILS UI
+ * ========================================================== */
+function qs(sel,root=document){ return root.querySelector(sel); }
+function qsa(sel,root=document){ return [...root.querySelectorAll(sel)]; }
+function setActive(navId){
+  qsa('header .nav a').forEach(a=>a.classList.remove('active'));
+  qs('#'+navId)?.classList.add('active');
+}
+const UI = {
+  badgeQualified(ok){ return `<span class="badge ${ok?'ok':'fail'}">${ok?'Qualificato':'Non qualificato'}</span>` },
+  check(ok){ return `<span class="check-dot ${ok?'ok':''}">${ok?'✓':'—'}</span>` },
+  progress(ok){ return `<span class="progress-pill">${ok?'Documentazione completata':'Documentazione da completare'}</span>` },
+  // simple toasts
+  toast(msg){ alert(msg) }
+};
 
+/* ==========================================================
+ *  DATA
+ * ========================================================== */
 async function boot(){
   try{
-    company = await fetch(`${API}/company`).then(r=>r.json());
-    sites   = await fetch(`${API}/sites`).then(r=>r.json());
-    workers = await fetch(`${API}/workers`).then(r=>r.json());
-  }catch(e){ console.error(e); }
+    STATE.company = await fetch(`${API}/company`).then(r=>r.json());
+  }catch{ STATE.company = {}; }
+
+  try{
+    STATE.sites = await fetch(`${API}/sites`).then(r=>r.json());
+  }catch{ STATE.sites = []; }
+
+  try{
+    STATE.workers = await fetch(`${API}/workers`).then(r=>r.json());
+  }catch{ STATE.workers = []; }
 }
 
-function renderRoute(){
-  const root = byId('app');
-  root.innerHTML = '';
+/* ==========================================================
+ *  ROUTER (hash)
+ * ========================================================== */
+window.addEventListener('hashchange', route);
+async function route(){
   const hash = location.hash || '#/dashboard';
-  // dettaglio cantiere
-  if(hash.startsWith('#/sites/')){
-    const parts = hash.split('?')[0].split('/');
-    const siteId = parts[2];
-    const tab = new URLSearchParams(hash.split('?')[1]||'').get('tab') || 'overview';
-    return renderSiteDetailPage(root, siteId, tab);
-  }
-  const route = hash.split('?')[0];
-  const map = {
-    '#/dashboard': renderDashboardPage,
-    '#/sites':     renderSitesListPage,
-    '#/workers':   renderWorkersListPage,
-    '#/deadlines': renderDeadlinesPage,
-    '#/settings':  renderSettingsPage
-  };
-  (map[route] || renderNotFound)(root);
+  if(!STATE.company) await boot();
+
+  if(hash.startsWith('#/dashboard')){ setActive('nav-dash'); renderDashboard(); return; }
+  if(hash.startsWith('#/sites/')){    setActive('nav-sites'); const id = hash.split('/')[2]; renderSiteDetail(id); return; }
+  if(hash.startsWith('#/sites')){     setActive('nav-sites'); renderSites(); return; }
+  if(hash.startsWith('#/workers')){   setActive('nav-workers'); renderWorkers(); return; }
+  if(hash.startsWith('#/settings')){  setActive('nav-settings'); renderSettings(); return; }
+  setActive('nav-dash'); renderDashboard();
 }
+document.addEventListener('DOMContentLoaded', route);
 
-/* ========= PAGES ========= */
+/* ==========================================================
+ *  DASHBOARD
+ * ========================================================== */
+function renderDashboard(){
+  const app = qs('#app');
+  // kpi demo (scadenze: calcoliamo se expiry_date entro 30gg)
+  const dueSoon = STATE.workers
+    .flatMap(w => Object.values(w.docs||{}))
+    .filter(d => !!d?.expiry_date)
+    .filter(d => {
+      const left = (new Date(d.expiry_date) - new Date())/86400000;
+      return left <= 30 && left >= 0;
+    }).length;
 
-function pageTitle(title){
-  return `<h1 class="text-2xl font-semibold mb-4">${title}</h1>`;
-}
+  const nonCompliant = STATE.workers.filter(w => {
+    const d = w.docs||{};
+    return !(d.visita_medica && d.corso_generale && d.corso_specifica_fs && d.dpi_consegna);
+  }).length;
 
-/* --- Dashboard --- */
-function renderDashboardPage(root){
-  // KPI
-  const kpiSites = sites.length;
-  let kpiDue = 0;
-  let kpiBad = 0;
-  for(const w of workers){
-    if(!isQualified(w)) kpiBad++;
-    for(const [key,_] of Object.entries(EXPIRY_KEYS)){
-      const v=w.docs?.[key];
-      if(typeof v==='string' && daysUntil(v)<=30) kpiDue++;
-    }
-  }
-
-  const wrap = q(`
-    <section>
-      ${pageTitle('Dashboard')}
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="card rounded-xl p-4"><div class="muted text-sm">Active sites</div><div class="text-3xl font-semibold mt-1">${kpiSites}</div></div>
-        <div class="card rounded-xl p-4"><div class="muted text-sm">Docs due in 30 days</div><div class="text-3xl font-semibold mt-1">${kpiDue}</div></div>
-        <div class="card rounded-xl p-4"><div class="muted text-sm">Non-compliant workers</div><div class="text-3xl font-semibold mt-1">${kpiBad}</div></div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        <div class="card rounded-xl p-4">
-          <div class="font-semibold mb-2">Prossime scadenze (30 giorni)</div>
-          <div id="dashDue"></div>
-          <a href="#/deadlines" class="text-sky-400 underline text-sm mt-3 inline-block">Vai a Deadlines</a>
+  app.innerHTML = `
+    <div class="section">
+      <h3>Dashboard</h3>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px">
+        <div class="kpi">
+          <div class="label">Active sites</div>
+          <div style="font-size:26px;font-weight:800">${STATE.sites.length}</div>
         </div>
-        <div class="card rounded-xl p-4">
-          <div class="font-semibold mb-2">Ultimi upload</div>
-          <div id="dashUploads" class="text-sm"></div>
+        <div class="kpi">
+          <div class="label">Docs due in 30 days</div>
+          <div style="font-size:26px;font-weight:800">${dueSoon}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Non-compliant workers</div>
+          <div style="font-size:26px;font-weight:800">${nonCompliant}</div>
         </div>
       </div>
-
-      <div class="mt-8">
-        <div class="font-semibold mb-2">Azioni rapide</div>
-        <div class="flex gap-3">
-          <a href="#/sites" class="px-3 py-2 rounded bg-sky-600 hover:bg-sky-500 text-white text-sm">Vai ai cantieri</a>
-          <a href="#/workers" class="px-3 py-2 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-sm">Vai ai lavoratori</a>
-        </div>
-      </div>
-    </section>
-  `);
-  root.appendChild(wrap);
-
-  // Scadenze prossime
-  const dueList = [];
-  for(const w of workers){
-    for(const [key,_] of Object.entries(EXPIRY_KEYS)){
-      const v=w.docs?.[key];
-      if(typeof v==='string'){
-        const d=daysUntil(v);
-        if(d<=30) dueList.push({worker:w.name, doc:key, expiry:v, days:d});
-      }
-    }
-  }
-  dueList.sort((a,b)=>a.days-b.days);
-  byId('dashDue').innerHTML = dueList.slice(0,10).map(d => `
-    <div class="flex justify-between border-b border-slate-800 py-1">
-      <div>${d.worker} <span class="muted">(${d.doc})</span></div>
-      <div class="${d.days<0?'text-rose-400':'text-amber-300'}">${fmtDate(d.expiry)} (${d.days}g)</div>
     </div>
-  `).join('') || '<div class="muted">Nessuna scadenza imminente.</div>';
 
-  // Upload recenti (in-memory)
-  byId('dashUploads').innerHTML = recentUploads.slice(-8).reverse().map(u => `
-    <div class="flex justify-between border-b border-slate-800 py-1">
-      <div>${u.workerName} <span class="muted">(${u.docType})</span></div>
-      <div class="muted">${fmtDate(u.when)}</div>
+    <div class="section">
+      <div class="flex-sb">
+        <h3>Sites</h3>
+        <button class="btn" id="btnNewSite">+ New Site</button>
+      </div>
+      <div class="grid cards">
+        ${STATE.sites.map(renderSiteCard).join('') || `<div class="muted">Nessun cantiere</div>`}
+      </div>
     </div>
-  `).join('') || '<div class="muted">Ancora nessun upload.</div>';
+
+    <div class="section">
+      <div class="flex-sb">
+        <h3>Workers</h3>
+        <button class="btn" id="btnNewWorker">+ New Worker</button>
+      </div>
+      <div class="card">
+        ${renderWorkersTable(STATE.workers, false)}
+      </div>
+    </div>
+  `;
+
+  qs('#btnNewSite')?.addEventListener('click', openNewSiteDialog);
+  qs('#btnNewWorker')?.addEventListener('click', openNewWorkerDialog);
 }
 
-/* --- Sites list --- */
-function renderSitesListPage(root){
-  const wrap = q(`
-    <section>
-      ${pageTitle('Sites')}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="sitesGrid"></div>
-    </section>
-  `);
-  root.appendChild(wrap);
+function renderSiteCard(s){
+  return `
+    <a class="card" href="#/sites/${s.id}">
+      <div class="caps">${s.id}</div>
+      <div style="font-weight:800;margin-top:4px">${s.name}</div>
+      <div class="muted" style="margin-top:6px">${s.address||'—'}</div>
+      <div class="muted" style="margin-top:6px"><strong style="color:#e2e8f0">Client:</strong> ${s.client||'—'}</div>
+      <div class="muted" style="margin-top:6px"><strong style="color:#e2e8f0">Period:</strong> ${(s.dates?.start||'—')} → ${(s.dates?.end||'—')}</div>
+    </a>
+  `;
+}
 
-  byId('sitesGrid').innerHTML = (sites||[]).map(s => {
-    const period = (s.dates?.start && s.dates?.end) ? `${s.dates.start} → ${s.dates.end}` : '—';
+/* ==========================================================
+ *  SITES LIST
+ * ========================================================== */
+function renderSites(){
+  const app = qs('#app');
+  app.innerHTML = `
+    <div class="flex-sb section">
+      <h3>Sites</h3>
+      <button class="btn" id="btnNewSite">+ New Site</button>
+    </div>
+    <div class="grid cards">
+      ${STATE.sites.map(renderSiteCard).join('') || `<div class="muted">Nessun cantiere</div>`}
+    </div>
+  `;
+  qs('#btnNewSite')?.addEventListener('click', openNewSiteDialog);
+}
+
+/* ==========================================================
+ *  WORKERS LIST
+ * ========================================================== */
+function renderWorkers(){
+  const app = qs('#app');
+  app.innerHTML = `
+    <div class="flex-sb section">
+      <h3>Workers</h3>
+      <button class="btn" id="btnNewWorker">+ New Worker</button>
+    </div>
+    <div class="card">${renderWorkersTable(STATE.workers,true)}</div>
+  `;
+  qs('#btnNewWorker')?.addEventListener('click', openNewWorkerDialog);
+}
+function renderWorkersTable(list, showHeader=true){
+  const rows = list.map(w=>{
+    const d = w.docs||{};
+    const qual = !!(d.visita_medica && d.corso_generale && d.corso_specifica_fs);
+    const avanzOk = qual && !!d.dpi_consegna;
     return `
-      <a href="#/sites/${s.id}" class="block rounded-xl border border-slate-800 card p-4 hover:border-slate-700 transition">
-        <div class="text-xs text-slate-400 mb-1">${s.id}</div>
-        <div class="text-[17px] font-semibold text-slate-100">${s.name}</div>
-        <div class="text-sm text-slate-300 mt-1">${s.address || ''}</div>
-        <div class="text-sm text-slate-300 mt-2"><span class="text-slate-400">Client:</span> <b>${s.client || '—'}</b></div>
-        <div class="text-sm text-slate-300 mt-2"><span class="text-slate-400">Period:</span> ${period}</div>
-      </a>
+      <tr>
+        <td>
+          <div style="font-weight:600">${w.name}</div>
+          <div class="muted-small">${w.cf||''}</div>
+        </td>
+        <td>${UI.badgeQualified(qual)}</td>
+        <td>${UI.check(!!d.preposto)}</td>
+        <td>${UI.check(!!d.antincendio)}</td>
+        <td>${UI.check(!!d.primo_soccorso)}</td>
+        <td>${UI.progress(avanzOk)}</td>
+      </tr>
     `;
   }).join('');
-}
-
-/* --- Site detail with tabs --- */
-function renderSiteDetailPage(root, siteId, tab){
-  const site = sites.find(s=>s.id===siteId);
-  if(!site) return renderNotFound(root);
-
-  const tabs = ['overview','workers','documents','pos','ocr','activity'];
-  if(!tabs.includes(tab)) tab = 'overview';
-
-  const header = q(`
-    <section>
-      <div class="mb-2"><a href="#/sites" class="text-sky-400 underline text-sm">← Torna ai cantieri</a></div>
-      <h1 class="text-2xl font-semibold">${site.name}</h1>
-      <div class="muted mt-1">${site.address}</div>
-      <div class="muted mt-1"><b>Client:</b> ${site.client || '—'}</div>
-      <div class="muted mt-1"><b>Periodo:</b> ${site.dates?.start || ''} → ${site.dates?.end || ''}</div>
-
-      <div class="mt-5 flex gap-2 text-sm">
-        ${tabs.map(t => `
-          <a href="#/sites/${site.id}?tab=${t}" class="tab ${t===tab?'active':''} capitalize">${t}</a>
-        `).join('')}
-      </div>
-
-      <div id="siteTab" class="mt-4"></div>
-    </section>
-  `);
-  root.appendChild(header);
-
-  // render selected tab
-  const mount = byId('siteTab');
-  if(tab==='overview') renderSiteOverview(mount, site);
-  if(tab==='workers')  renderSiteWorkers(mount, site);
-  if(tab==='documents')renderSiteDocuments(mount, site);
-  if(tab==='pos')      renderSitePOS(mount, site);
-  if(tab==='ocr')      renderSiteOCR(mount, site);
-  if(tab==='activity') renderSiteActivity(mount, site);
-}
-
-function renderSiteOverview(root, site){
-  root.innerHTML = `
-    <div class="card rounded-xl p-4">
-      <div class="font-semibold mb-2">Ruoli principali</div>
-      <div class="text-sm"><b>Owner:</b> ${company.legal_rep || '—'}</div>
-      <div class="text-sm"><b>CSE:</b> ${site.cse?.name || '—'} ${site.cse?.email?('· '+site.cse.email):''}</div>
-      <div class="text-sm"><b>RSPP (azienda):</b> ${company.rspp?.name || '—'}</div>
-    </div>
-  `;
-}
-
-function renderSiteWorkers(root, site){
-  const siteWorkers = (site.workers||[]).map(id => workers.find(w=>w.id===id)).filter(Boolean);
-  root.innerHTML = `
-    <div class="card rounded-xl p-4">
-      <div class="font-semibold mb-3">Lavoratori assegnati</div>
-      <div class="overflow-x-auto rounded-xl border border-slate-800">
-        <table class="min-w-[900px] w-full">
-          <thead>
-            <tr class="bg-cyan-700 text-white text-sm">
-              <th class="text-left p-3">Lavoratore</th>
-              <th class="text-left p-3">Tipo</th>
-              <th class="text-left p-3">Stato</th>
-              <th class="p-3">Preposto</th>
-              <th class="p-3">Antincendio</th>
-              <th class="p-3">Primo Soccorso</th>
-              <th class="text-left p-3">Avanzamento</th>
-            </tr>
-          </thead>
-          <tbody class="text-sm text-slate-200">
-            ${
-              siteWorkers.map(w => `
-                <tr class="border-b border-slate-800">
-                  <td class="p-3">${w.name}<div class="text-xs muted">${w.cf||''}</div></td>
-                  <td class="p-3">Dipendente</td>
-                  <td class="p-3">${isQualified(w)?'<span class="text-emerald-400">Qualificato</span>':'<span class="text-rose-400">Non qualificato</span>'}</td>
-                  <td class="p-3 text-center">${hasDoc(w,'preposto')?iconTick:iconDash}</td>
-                  <td class="p-3 text-center">${hasDoc(w,'antincendio')?iconTick:iconDash}</td>
-                  <td class="p-3 text-center">${hasDoc(w,'ps')?iconTick:iconDash}</td>
-                  <td class="p-3">${progressLabel(w)}</td>
-                </tr>
-              `).join('') || '<tr><td class="p-3" colspan="7">Nessun lavoratore assegnato.</td></tr>'
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <div class="mt-4 flex items-end gap-2">
-        <div class="flex-1">
-          <label class="muted text-sm">Aggiungi lavoratore</label>
-          <select id="addW" class="w-full bg-slate-900/40 border border-slate-800 rounded-lg p-2 mt-1">
-            ${workers.filter(w=>!site.workers?.includes(w.id)).map(w=>`<option value="${w.id}">${w.name}</option>`).join('')}
-          </select>
-        </div>
-        <button id="btnAddW" class="px-3 py-2 rounded bg-sky-600 hover:bg-sky-500 text-white">Aggiungi</button>
-      </div>
-      <div id="msgAdd" class="muted text-sm mt-2"></div>
-    </div>
-  `;
-
-  byId('btnAddW').onclick = async () => {
-    const wid = byId('addW').value;
-    if(!wid) return;
-    // endpoint opzionale; se non disponibile, aggiorna solo UI per MVP
-    try{
-      const res = await fetch(`${API}/sites/${site.id}/workers`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ workerId: wid })
-      });
-      if(!res.ok) throw new Error();
-      const updated = await fetch(`${API}/sites`).then(r=>r.json());
-      sites = updated;
-      renderSiteWorkers(root, sites.find(s=>s.id===site.id));
-      byId('msgAdd').textContent = 'Assegnazione completata.';
-    }catch(e){
-      // fallback: aggiorna localmente
-      site.workers = Array.from(new Set([...(site.workers||[]), wid]));
-      renderSiteWorkers(root, site);
-      byId('msgAdd').textContent = 'Assegnato (solo in locale – endpoint non trovato).';
-    }
-  };
-}
-
-function renderSiteDocuments(root, site){
-  root.innerHTML = `
-    <div class="card rounded-xl p-4">
-      <div class="font-semibold mb-2">Documenti di cantiere</div>
-      <div class="muted">MVP placeholder: mostrare elenco POS/verbali caricati quando l’endpoint è disponibile.</div>
-    </div>
-  `;
-}
-
-function renderSitePOS(root, site){
-  const siteWorkers = (site.workers||[]).map(id=>workers.find(w=>w.id===id)).filter(Boolean);
-  root.innerHTML = `
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div class="card rounded-xl p-4 lg:col-span-2">
-        <div class="muted text-sm">Preview</div>
-        <textarea id="posPreview" rows="12" class="w-full bg-slate-900/40 border border-slate-800 rounded-lg p-3 font-mono text-sm mt-1"></textarea>
-      </div>
-      <div class="card rounded-xl p-4">
-        <div class="font-semibold mb-2">POS</div>
-        <button id="btnGenPOS" class="w-full px-4 py-3 rounded bg-sky-600 hover:bg-sky-500 text-white">Genera PDF</button>
-        <div id="posLink" class="text-sm mt-3"></div>
-      </div>
-    </div>
-  `;
-  const preview =
-`POS – Piano Operativo di Sicurezza
-Site: ${site.name} — ${site.address}
-Client: ${site.client || ''} — ${site.client_phone || ''}
-CSE: ${site.cse?.name || ''} — ${site.cse?.email || ''}
-Period: ${site.dates?.start || ''} → ${site.dates?.end || ''}
-
-Workers:
-${siteWorkers.map(w=>`- ${w.name} (${w.role||'Operaio'})`).join('\n')}`;
-  byId('posPreview').value = preview;
-
-  byId('btnGenPOS').onclick = async ()=>{
-    const r = await fetch(`${API}/pos`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ site, workers: siteWorkers })
-    }).then(r=>r.json()).catch(()=>({ok:false}));
-    const out = byId('posLink');
-    if(r.ok){ out.innerHTML = `<a href="${r.url}" target="_blank" class="text-sky-400 underline">Apri PDF generato</a>`; }
-    else out.textContent = 'Errore nella generazione del POS';
-  };
-}
-
-function renderSiteOCR(root, site){
-  const siteWorkers = (site.workers||[]).map(id=>workers.find(w=>w.id===id)).filter(Boolean);
-  root.innerHTML = `
-    <div class="card rounded-xl p-4">
-      <div class="grid md:grid-cols-2 gap-3 items-end">
-        <div>
-          <label class="muted text-sm">Worker</label>
-          <select id="ocrWorker" class="w-full bg-slate-900/40 border border-slate-800 rounded-lg p-2 mt-1">
-            ${siteWorkers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('') || `<option value="">—</option>`}
-          </select>
-        </div>
-        <div>
-          <input id="ocrFile" type="file" class="block w-full text-sm file:mr-3 file:py-2 file:px-4 file:border-0 file:rounded file:text-sm file:bg-slate-800 file:text-white file:hover:bg-slate-700"/>
-        </div>
-      </div>
-      <div class="mt-3 flex gap-2">
-        <button id="btnOCR" class="px-4 py-2 rounded bg-sky-600 hover:bg-sky-500 text-white">Upload & OCR</button>
-        <div id="ocrMsg" class="text-sm mt-2"></div>
-      </div>
-    </div>
-  `;
-  byId('btnOCR').onclick = ()=> handleOCR(byId('ocrWorker').value);
-  async function handleOCR(workerId){
-    const file = byId('ocrFile').files[0];
-    const msg = byId('ocrMsg');
-    msg.textContent = '';
-    if(!workerId || !file){ msg.textContent='Seleziona lavoratore e file.'; return; }
-    const fd=new FormData(); fd.append('file',file);
-    const r = await fetch(`${API}/workers/${workerId}/docs`, { method:'POST', body:fd }).then(r=>r.json()).catch(()=>({ok:false}));
-    if(!r.ok){ msg.textContent='Upload/OCR fallito'; return; }
-
-    // Mapping doc_type -> key
-    const map = {
-      'visita_medica':'visita_medica',
-      'formazione_generale':'corso_generale',
-      'formazione_specifica':'corso_specifica_fs',
-      'alto_rischio':'corso_alto_rischio',
-      'antincendio':'antincendio',
-      'primo_soccorso':'ps',
-      'dpi':'dpi_consegna',
-      'tesserino':'tesserino',
-      'preposto':'preposto',
-      'rls':'rls'
-    };
-    const key = map[r.extracted?.doc_type] || null;
-    const patch = key ? { docs: { [key]: r.extracted?.expiry_date || true } } : {};
-    await fetch(`${API}/workers/${workerId}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(patch) }).catch(()=>{});
-
-    workers = await fetch(`${API}/workers`).then(r=>r.json()).catch(()=>workers);
-    recentUploads.push({workerName: (workers.find(w=>w.id===workerId)?.name||workerId), docType:r.extracted?.doc_type||'doc', when:new Date().toISOString()});
-    msg.textContent = 'Aggiornato.';
-  }
-}
-
-function renderSiteActivity(root, site){
-  root.innerHTML = `
-    <div class="card rounded-xl p-4">
-      <div class="muted">MVP placeholder: qui log operazioni (upload, POS generati, assegnazioni).</div>
-    </div>
-  `;
-}
-
-/* --- Workers list (globale) --- */
-function renderWorkersListPage(root){
-  const wrap = q(`
-    <section>
-      ${pageTitle('Workers')}
-      <div id="workersTable"></div>
-    </section>
-  `);
-  root.appendChild(wrap);
-  renderWorkersTable('workersTable', workers);
-}
-
-function renderWorkersTable(hostId, data){
-  const host = byId(hostId);
-  const rows = (data||[]).map(w => `
-    <tr class="border-b border-slate-800 hover:bg-slate-900/30">
-      <td class="py-3">
-        <div class="text-sky-400">${w.name}</div>
-        <div class="text-xs muted">${w.cf||''}</div>
-      </td>
-      <td class="py-3">Dipendente</td>
-      <td class="py-3">${isQualified(w)?'<span class="text-emerald-400">Qualificato</span>':'<span class="text-rose-400">Non qualificato</span>'}</td>
-      <td class="py-3 text-center">${hasDoc(w,'preposto')?iconTick:iconDash}</td>
-      <td class="py-3 text-center">${hasDoc(w,'antincendio')?iconTick:iconDash}</td>
-      <td class="py-3 text-center">${hasDoc(w,'ps')?iconTick:iconDash}</td>
-      <td class="py-3"><span class="text-sm ${isQualified(w)?'text-emerald-400':'text-amber-300'}">${progressLabel(w)}</span></td>
-    </tr>
-  `).join('');
-
-  host.innerHTML = `
-    <div class="overflow-x-auto rounded-xl border border-slate-800">
-      <table class="min-w-[900px] w-full">
+  return `
+    <div style="overflow:auto">
+      <table class="table">
         <thead>
-          <tr class="bg-cyan-700 text-white text-sm">
-            <th class="text-left p-3">Lavoratore</th>
-            <th class="text-left p-3">Tipo</th>
-            <th class="text-left p-3">Stato</th>
-            <th class="p-3">Preposto</th>
-            <th class="p-3">Antincendio</th>
-            <th class="p-3">Primo Soccorso</th>
-            <th class="text-left p-3">Avanzamento</th>
+          <tr>
+            <th>Lavoratore</th>
+            <th>Stato</th>
+            <th>Preposto</th>
+            <th>Antincendio</th>
+            <th>Primo Soccorso</th>
+            <th>Avanzamento</th>
           </tr>
         </thead>
-        <tbody class="text-sm text-slate-200">${rows}</tbody>
+        <tbody>${rows}</tbody>
       </table>
     </div>
   `;
 }
 
-/* --- Deadlines --- */
-function renderDeadlinesPage(root){
-  const all = [];
-  for(const w of workers){
-    for(const [key,_] of Object.entries(EXPIRY_KEYS)){
-      const v=w.docs?.[key];
-      if(typeof v==='string'){
-        const d=daysUntil(v);
-        all.push({worker:w.name, doc:key, expiry:v, days:d});
-      }
+/* ==========================================================
+ *  SETTINGS (Company)
+ * ========================================================== */
+function renderSettings(){
+  const c = STATE.company || {};
+  const app = qs('#app');
+  app.innerHTML = `
+    <div class="section">
+      <h3>Settings</h3>
+      <div class="card">
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <label>Ragione sociale</label>
+            <input id="c_name" value="${c.name||''}">
+          </div>
+          <div>
+            <label>P. IVA</label>
+            <input id="c_vat" value="${c.vat||''}">
+          </div>
+          <div>
+            <label>Indirizzo</label>
+            <input id="c_address" value="${c.address||''}">
+          </div>
+          <div>
+            <label>Legale rappresentante</label>
+            <input id="c_legal" value="${c.legal_rep||''}">
+          </div>
+          <div>
+            <label>RSPP – Nome</label>
+            <input id="c_rspp_name" value="${c.rspp?.name||''}">
+          </div>
+          <div>
+            <label>RSPP – Email</label>
+            <input id="c_rspp_email" value="${c.rspp?.email||''}">
+          </div>
+        </div>
+        <div class="divider"></div>
+        <button id="btnSaveCompany" class="btn">Salva</button>
+      </div>
+    </div>
+  `;
+  qs('#btnSaveCompany')?.addEventListener('click', async ()=>{
+    const payload = {
+      name: qs('#c_name').value.trim(),
+      vat: qs('#c_vat').value.trim(),
+      address: qs('#c_address').value.trim(),
+      legal_rep: qs('#c_legal').value.trim(),
+      rspp: { name: qs('#c_rspp_name').value.trim(), email: qs('#c_rspp_email').value.trim() }
+    };
+    const res = await fetch(`${API}/company`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()).catch(()=>null);
+    if(res?.ok){
+      STATE.company = res.company;
+      UI.toast('Impostazioni salvate');
+    }else{
+      UI.toast('Errore salvataggio impostazioni');
+    }
+  });
+}
+
+/* ==========================================================
+ *  SITE DETAIL (tabs + workers table in stile screenshot)
+ * ========================================================== */
+async function renderSiteDetail(siteId){
+  // Sync latest site data
+  const site = await fetch(`${API}/sites/${siteId}`).then(r=>r.json());
+  // ensure local state has it
+  const idx = STATE.sites.findIndex(s=>s.id===siteId);
+  if(idx>-1) STATE.sites[idx] = site; else STATE.sites.push(site);
+
+  // workers
+  if(!STATE.workers?.length){
+    STATE.workers = await fetch(`${API}/workers`).then(r=>r.json()).catch(()=>[]);
+  }
+  const workersAll = STATE.workers;
+  const workersInSite = (site.workers||[]).map(id => workersAll.find(w=>w.id===id)).filter(Boolean);
+
+  let activeTab = 'workers';
+  const app = qs('#app');
+  app.innerHTML = `
+    <div style="margin-bottom:16px">
+      <h2 style="font-size:22px;font-weight:800">${site.name}</h2>
+      <div class="muted" style="margin-top:6px">${site.address||'—'}</div>
+      <div class="muted" style="margin-top:4px"><strong style="color:#e2e8f0">Client:</strong> ${site.client||'—'}</div>
+      <div class="muted" style="margin-top:4px"><strong style="color:#e2e8f0">Periodo:</strong> ${(site.dates?.start||'—')} → ${(site.dates?.end||'—')}</div>
+    </div>
+
+    <div class="section-surface">
+      <div class="tabs" id="tabs">
+        <button class="tab" data-tab="overview">Overview</button>
+        <button class="tab active" data-tab="workers">Workers</button>
+        <button class="tab" data-tab="documents">Documents</button>
+        <button class="tab" data-tab="pos">Pos</button>
+        <button class="tab" data-tab="ocr">Ocr</button>
+        <button class="tab" data-tab="activity">Activity</button>
+      </div>
+      <div id="siteTabContent"></div>
+    </div>
+  `;
+
+  function mountTab(){
+    qsa('#tabs .tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===activeTab));
+    const box = qs('#siteTabContent');
+
+    if(activeTab==='workers'){
+      const rows = workersInSite.map(w=>{
+        const d = w.docs||{};
+        const qual = !!(d.visita_medica && d.corso_generale && d.corso_specifica_fs);
+        const avanzOk = qual && !!d.dpi_consegna;
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:600">${w.name}</div>
+              <div class="muted-small">${w.cf||''}</div>
+            </td>
+            <td>Dipendente</td>
+            <td>${UI.badgeQualified(qual)}</td>
+            <td>${UI.check(!!d.preposto)}</td>
+            <td>${UI.check(!!d.antincendio)}</td>
+            <td>${UI.check(!!d.primo_soccorso)}</td>
+            <td>${UI.progress(avanzOk)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const options = workersAll
+        .filter(w => !(site.workers||[]).includes(w.id))
+        .map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+
+      box.innerHTML = `
+        <div style="font-weight:700;margin-bottom:10px">Lavoratori assegnati</div>
+        <div style="overflow:auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Lavoratore</th>
+                <th>Tipo</th>
+                <th>Stato</th>
+                <th>Preposto</th>
+                <th>Antincendio</th>
+                <th>Primo Soccorso</th>
+                <th>Avanzamento</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        <div class="add-row">
+          <select id="addWorkerSelect">${options || '<option disabled selected>Nessun lavoratore disponibile</option>'}</select>
+          <button id="btnAddWorker" class="btn">Aggiungi</button>
+        </div>
+      `;
+
+      qs('#btnAddWorker')?.addEventListener('click', async ()=>{
+        const sel = qs('#addWorkerSelect'); const workerId = sel?.value;
+        if(!workerId) return;
+        // preferita: route dedicata (già suggerita)
+        let ok = false;
+        try{
+          const r = await fetch(`${API}/sites/${site.id}/workers`,{
+            method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({workerId})
+          });
+          ok = r.ok;
+        }catch{}
+        if(!ok){
+          // fallback: ricarica sites (magari backend non ha route)
+          UI.toast('Impossibile assegnare (abilita POST /api/sites/:id/workers sul backend)');
+          return;
+        }
+        // refresh dettagli
+        renderSiteDetail(site.id);
+      });
+
+    } else if(activeTab==='overview'){
+      box.innerHTML = `
+        <div style="line-height:1.8">
+          <div><strong>Durata:</strong> ${(site.dates?.start||'—')} → ${(site.dates?.end||'—')} (${site.meta?.duration_days||'—'} gg)</div>
+          <div><strong>Note:</strong> ${(site.meta?.warnings||[]).join(', ') || '—'}</div>
+        </div>
+      `;
+    } else if(activeTab==='documents'){
+      box.innerHTML = `<div>Documenti del cantiere — (in arrivo)</div>`;
+    } else if(activeTab==='pos'){
+      box.innerHTML = `
+        <div class="flex" style="gap:10px">
+          <button id="btnPos" class="btn">Genera POS (PDF)</button>
+          <a id="posLink" class="btn-outline" style="display:none" target="_blank">Apri PDF</a>
+        </div>
+      `;
+      qs('#btnPos')?.addEventListener('click', async ()=>{
+        const res = await fetch(`${API}/pos`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ site, workers: workersInSite })
+        }).then(r=>r.json()).catch(()=>null);
+        if(res?.url){
+          const a = qs('#posLink'); a.href = res.url; a.style.display='inline-flex';
+        }else{
+          UI.toast('Errore generazione POS');
+        }
+      });
+    } else if(activeTab==='ocr'){
+      box.innerHTML = `<div>Upload & OCR — (in arrivo)</div>`;
+    } else {
+      box.innerHTML = `<div>Activity log — (in arrivo)</div>`;
     }
   }
-  all.sort((a,b)=>a.days-b.days);
 
-  const wrap = q(`
-    <section>
-      ${pageTitle('Deadlines')}
-      <div class="overflow-x-auto rounded-xl border border-slate-800">
-        <table class="min-w-[700px] w-full">
-          <thead>
-            <tr class="bg-cyan-700 text-white text-sm">
-              <th class="text-left p-3">Lavoratore</th>
-              <th class="text-left p-3">Documento</th>
-              <th class="text-left p-3">Scadenza</th>
-              <th class="text-left p-3">Giorni</th>
-            </tr>
-          </thead>
-          <tbody class="text-sm text-slate-200">
-            ${
-              all.map(d=>`
-                <tr class="border-b border-slate-800">
-                  <td class="p-3">${d.worker}</td>
-                  <td class="p-3">${d.doc}</td>
-                  <td class="p-3">${fmtDate(d.expiry)}</td>
-                  <td class="p-3 ${d.days<0?'text-rose-400':'text-amber-300'}">${d.days}</td>
-                </tr>
-              `).join('') || '<tr><td class="p-3" colspan="4">Nessuna scadenza.</td></tr>'
-            }
-          </tbody>
-        </table>
-      </div>
-    </section>
-  `);
-  root.appendChild(wrap);
+  qs('#tabs').addEventListener('click', (e)=>{
+    const t = e.target.closest('.tab'); if(!t) return;
+    activeTab = t.dataset.tab; mountTab();
+  });
+  mountTab();
 }
 
-/* --- Settings --- */
-function renderSettingsPage(root){
-  const c = company || {};
-  const wrap = q(`
-    <section>
-      ${pageTitle('Settings')}
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="card rounded-xl p-4">
-          <div class="font-semibold mb-2">Azienda</div>
-          <div class="text-sm">Ragione sociale: <b>${c.name||'—'}</b></div>
-          <div class="text-sm">P.IVA: <b>${c.vat||'—'}</b></div>
-          <div class="text-sm">Indirizzo: <b>${c.address||'—'}</b></div>
-          <div class="text-sm">Legale rappresentante: <b>${c.legal_rep||'—'}</b></div>
-        </div>
-        <div class="card rounded-xl p-4">
-          <div class="font-semibold mb-2">Contatti sicurezza</div>
-          <div class="text-sm">RSPP: <b>${c.rspp?.name||'—'}</b> ${c.rspp?.email?('· '+c.rspp.email):''}</div>
-          <div class="muted text-sm mt-2">MVP: la modifica verrà aggiunta in seguito (PATCH /company).</div>
-        </div>
-      </div>
-    </section>
-  `);
-  root.appendChild(wrap);
+/* ==========================================================
+ *  DIALOGS – quick add
+ * ========================================================== */
+function openNewWorkerDialog(){
+  const name = prompt('Nome e cognome lavoratore:');
+  if(!name) return;
+  const cf = prompt('Codice fiscale (facoltativo):') || '';
+  fetch(`${API}/workers`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, cf })
+  }).then(r=>r.json()).then(async w=>{
+    STATE.workers = await fetch(`${API}/workers`).then(r=>r.json()).catch(()=>STATE.workers);
+    route();
+  }).catch(()=>UI.toast('Errore creazione lavoratore'));
 }
-
-/* --- Not found --- */
-function renderNotFound(root){
-  root.innerHTML = `<div class="text-center mt-20">Pagina non trovata.</div>`;
+function openNewSiteDialog(){
+  const name = prompt('Nome cantiere:');
+  if(!name) return;
+  const address = prompt('Indirizzo:') || '';
+  const client = prompt('Cliente:') || '';
+  const start = prompt('Data inizio (YYYY-MM-DD):') || '';
+  const end   = prompt('Data fine (YYYY-MM-DD):') || '';
+  const payload = {
+    name, address, client,
+    dates: { start, end },
+    roles: [] // backend assegna owner automatico se vuoto (V1.5)
+  };
+  fetch(`${API}/sites`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  }).then(r=>r.json()).then(async s=>{
+    STATE.sites = await fetch(`${API}/sites`).then(r=>r.json()).catch(()=>STATE.sites);
+    location.hash = `#/sites/${s.id}`;
+  }).catch(()=>UI.toast('Errore creazione cantiere'));
 }
 </script>
 </body>
