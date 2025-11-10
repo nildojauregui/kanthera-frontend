@@ -4,585 +4,388 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>KANTHERA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0b1220;           /* slate-950-ish */
-    --card:#0f172a;         /* slate-900 */
-    --muted:#94a3b8;        /* slate-400 */
-    --text:#e2e8f0;         /* slate-200 */
-    --line:rgba(255,255,255,.08);
-    --line2:rgba(255,255,255,.06);
-    --blue:#60a5fa;         /* blue-400 */
-    --blue-12:rgba(59,130,246,.12);
-    --blue-22:rgba(59,130,246,.22);
-    --green:#10b981;        /* emerald-500 */
-    --red:#ef4444;          /* red-500 */
-    --amber:#f59e0b;        /* amber-500 */
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
-  }
-  a{color:var(--blue);text-decoration:none}
-  .container{max-width:1100px;margin:0 auto;padding:24px}
-  /* Topbar */
-  .topbar{
-    position:sticky;top:0;z-index:9;
-    background:rgba(11,18,32,.85);backdrop-filter:saturate(120%) blur(8px);
-    border-bottom:1px solid var(--line);padding:10px 16px;
-  }
-  .nav{display:flex;align-items:center;gap:18px;max-width:1100px;margin:0 auto}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
-  .logo{
-    display:grid;place-items:center;width:28px;height:28px;border-radius:8px;
-    color:#fff;background:#3b82f6;font-weight:800;
-  }
-  .nav a{color:#cbd5e1}
-  .nav a.active{color:#fff;font-weight:700}
-  .spacer{flex:1}
-  .slogan{color:#cbd5e1;font-size:12px}
+:root{
+  --bg:#0B1220; --card:#0f172a; --muted:#94a3b8; --line:#1f2937; --fg:#e5e7eb; --brand:#3b82f6; --ok:#22c55e; --warn:#f59e0b;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+a{color:inherit;text-decoration:none}
+hr{border:0;height:1px;background:var(--line);margin:12px 0}
 
-  /* Buttons / inputs */
-  .btn{display:inline-flex;align-items:center;gap:8px;background:#3b82f6;color:#00122b;padding:9px 12px;border:none;border-radius:10px;font-weight:700;cursor:pointer}
-  .btn:hover{filter:brightness(1.05)}
-  .btn-outline{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);color:#cbd5e1;background:transparent;padding:9px 12px;border-radius:10px}
-  .btn-outline:hover{border-color:var(--blue);color:#fff}
-  input,select,textarea{
-    width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line2);border-radius:10px;color:var(--text);
-    padding:10px 12px;outline:none
-  }
-  label{color:#cbd5e1;font-size:12px;margin-bottom:6px;display:block}
+.container{max-width:1180px;margin:0 auto;padding:20px}
+.header{display:flex;gap:14px;align-items:center;padding:16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,18,32,.9);backdrop-filter:blur(8px);z-index:10}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700}
+.logo-badge{width:28px;height:28px;border-radius:8px;background:#3b82f6;display:grid;place-content:center;font-weight:800}
+.nav{margin-left:auto;display:flex;gap:16px}
+.nav a{padding:.45rem .7rem;border-radius:8px}
+.nav a.active{background:rgba(148,163,184,.14)}
+.btn{background:var(--brand);border:none;border-radius:8px;color:#fff;padding:.55rem .9rem;cursor:pointer;font-weight:600}
+.btn-outline{border:1px solid var(--line);background:transparent;border-radius:8px;color:#cbd5e1;padding:.55rem .9rem;cursor:pointer}
+.btn-danger{background:#ef4444;border:none;border-radius:8px;color:#fff;padding:.42rem .7rem;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.grid{display:grid;gap:14px}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.hstack{display:flex;gap:10px;align-items:center}
+.vstack{display:flex;flex-direction:column;gap:6px}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px}
+.subtle{color:var(--muted)}
+.badge{display:inline-block;background:rgba(148,163,184,.12);border:1px solid var(--line);border-radius:999px;padding:.18rem .52rem;color:var(--muted);font-size:12px}
+.kpi{font-size:24px;font-weight:700}
 
-  /* Sections / cards */
-  .section{margin:20px 0}
-  .section h3{margin:0 0 12px 0}
-  .grid{display:grid;gap:14px}
-  .grid.cards{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
-  .card{
-    background:var(--card);border:1px solid var(--line2);border-radius:14px;padding:16px;transition:120ms ease;
-  }
-  .card:hover{border-color:var(--line);transform:translateY(-1px)}
-  .kpi{display:grid;gap:6px;background:var(--card);border:1px solid var(--line2);border-radius:14px;padding:16px}
-  .kpi .label{color:#cbd5e1}
-  .muted{color:var(--muted)}
-  .flex{display:flex;gap:10px;align-items:center}
-  .flex-sb{display:flex;gap:10px;align-items:center;justify-content:space-between}
+/* site cards */
+.sitecard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:border .15s}
+.sitecard:hover{border-color:#2a3b5a}
 
-  /* Tabs + workers table (site detail) */
-  .section-surface {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 16px;
-  }
-  .tabs { display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:12px }
-  .tab { padding:8px 14px;border-radius:8px 8px 0 0;color:#cbd5e1;cursor:pointer;background:transparent;border:1px solid transparent }
-  .tab:hover { color:#fff;background:rgba(255,255,255,.04) }
-  .tab.active { color:#fff;background:var(--blue-12);border-color:var(--blue-22);border-bottom-color:transparent }
+/* table */
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.table thead th{color:var(--muted);font-weight:600}
 
-  .table{width:100%;border-collapse:collapse;font-size:14px}
-  .table thead th{ text-align:left;color:#cbd5e1;padding:10px 12px;background:rgba(255,255,255,.04);border-bottom:1px solid var(--line) }
-  .table tbody td{ padding:12px;border-bottom:1px solid var(--line2);color:var(--text) }
-  .muted-small{ color:var(--muted); font-size:12px;margin-top:3px }
-
-  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;letter-spacing:.2px;border:1px solid transparent}
-  .badge.ok{color:var(--green);background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.22)}
-  .badge.fail{color:var(--red);background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.22)}
-  .progress-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:12px;color:#93c5fd;background:var(--blue-12);border:1px solid var(--blue-22)}
-  .check-dot{ width:18px;height:18px;display:grid;place-items:center;border-radius:999px;border:1px solid var(--line2);color:#a3e635 }
-  .check-dot.ok{ border-color:rgba(163,230,53,.35); background:rgba(163,230,53,.12) }
-
-  .add-row{display:flex;gap:10px;align-items:center;margin-top:12px}
-  .divider{height:1px;background:var(--line);margin:14px 0}
-
-  /* small helpers */
-  .caps{font-size:12px;letter-spacing:.4px;color:#cbd5e1}
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;align-items:center;justify-content:center;z-index:50}
+.modal-backdrop.show{display:flex}
+.modal{width:min(880px,96vw);background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.5)}
+.modal h3{margin:0 0 14px 0}
+.modal .grid{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.modal .col-span-2{grid-column:1 / -1}
+.modal footer{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:#0b1220;color:#e5e7eb;padding:.6rem .7rem;border-radius:10px}
+select{background:#0b1220}
+.help{font-size:12px;color:var(--muted)}
+.alert{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.4);padding:10px;border-radius:8px}
+.pill-ok{color:#22c55e}
+.pill-bad{color:#ef4444}
 </style>
 </head>
 <body>
-
-<header class="topbar">
-  <nav class="nav">
-    <div class="brand">
-      <div class="logo">K</div>
-      <div>
-        <div style="font-weight:800">KANTHERA</div>
-        <div class="slogan">Tu costruisci. Noi semplifichiamo.</div>
-      </div>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-badge">K</div>
+      KANTHERA
+      <span class="subtle">Tu costruisci. Noi semplifichiamo.</span>
     </div>
-    <a href="#/dashboard" id="nav-dash">Dashboard</a>
-    <a href="#/sites" id="nav-sites">Sites</a>
-    <a href="#/workers" id="nav-workers">Workers</a>
-    <a href="#/settings" id="nav-settings">Settings</a>
-    <div class="spacer"></div>
-  </nav>
-</header>
+    <nav class="nav">
+      <a href="#/dashboard" id="lnkDash">Dashboard</a>
+      <a href="#/sites" id="lnkSites">Sites</a>
+      <a href="#/workers" id="lnkWorkers">Workers</a>
+      <a href="#/pos" id="lnkPos">POS</a>
+      <a href="#/ocr" id="lnkOcr">OCR</a>
+    </nav>
+  </header>
 
-<main class="container">
-  <div id="app"></div>
-</main>
+  <main class="container" id="app"></main>
+
+  <!-- Modal: Nuovo Cantiere -->
+  <div id="siteModal" class="modal-backdrop">
+    <div class="modal">
+      <h3>Nuovo cantiere</h3>
+      <div class="grid">
+        <div class="col-span-2">
+          <label>Nome</label>
+          <input id="m_site_name" placeholder="Es. Sede Cliente Verdi – Piano 3">
+          <div class="help">Inserisci un nome chiaro del cantiere.</div>
+        </div>
+        <div class="col-span-2">
+          <label>Indirizzo</label>
+          <input id="m_site_address" placeholder="Via ... , Città">
+        </div>
+        <div>
+          <label>Data inizio</label>
+          <input id="m_site_start" type="date">
+        </div>
+        <div>
+          <label>Data fine (opz.)</label>
+          <input id="m_site_end" type="date">
+        </div>
+        <div>
+          <label>Cliente (opz.)</label>
+          <input id="m_site_client" placeholder="Ragione sociale">
+        </div>
+        <div>
+          <label>Email CSE (opz.)</label>
+          <input id="m_site_cse_email" type="email" placeholder="nome@esempio.it">
+        </div>
+      </div>
+      <footer>
+        <button id="m_cancel" class="btn-outline">Annulla</button>
+        <button id="m_create" class="btn">Crea</button>
+      </footer>
+    </div>
+  </div>
 
 <script>
-/* ==========================================================
- *  CONFIG
- *  Aggiorna con il tuo backend:
- * ========================================================== */
-const API = 'https://kanthera-backend.onrender.com/api'; // <-- CAMBIA QUI se serve
+/* ------------ CONFIG ------------ */
+const API = (window.API_BASE || 'https://kanthera-backend.onrender.com/api'); // <-- cambia se serve
+const qs  = (s,el=document)=>el.querySelector(s);
+const qsa = (s,el=document)=>[...el.querySelectorAll(s)];
+const STATE = { sites:[], workers:[], company:{} };
 
-/* ==========================================================
- *  STATE
- * ========================================================== */
-let STATE = {
-  company: null,
-  sites:   [],
-  workers: [],
-};
-
-/* ==========================================================
- *  UTILS UI
- * ========================================================== */
-function qs(sel,root=document){ return root.querySelector(sel); }
-function qsa(sel,root=document){ return [...root.querySelectorAll(sel)]; }
-function setActive(navId){
-  qsa('header .nav a').forEach(a=>a.classList.remove('active'));
-  qs('#'+navId)?.classList.add('active');
+/* ------------ NAV ------------ */
+function setActive(){
+  const h = location.hash||'#/dashboard';
+  for (const a of qsa('.nav a')) a.classList.toggle('active', a.getAttribute('href')===h);
 }
-const UI = {
-  badgeQualified(ok){ return `<span class="badge ${ok?'ok':'fail'}">${ok?'Qualificato':'Non qualificato'}</span>` },
-  check(ok){ return `<span class="check-dot ${ok?'ok':''}">${ok?'✓':'—'}</span>` },
-  progress(ok){ return `<span class="progress-pill">${ok?'Documentazione completata':'Documentazione da completare'}</span>` },
-  // simple toasts
-  toast(msg){ alert(msg) }
-};
+window.addEventListener('hashchange', ()=>{ setActive(); router(); });
 
-/* ==========================================================
- *  DATA
- * ========================================================== */
-async function boot(){
-  try{
-    STATE.company = await fetch(`${API}/company`).then(r=>r.json());
-  }catch{ STATE.company = {}; }
-
-  try{
-    STATE.sites = await fetch(`${API}/sites`).then(r=>r.json());
-  }catch{ STATE.sites = []; }
-
-  try{
-    STATE.workers = await fetch(`${API}/workers`).then(r=>r.json());
-  }catch{ STATE.workers = []; }
-}
-
-/* ==========================================================
- *  ROUTER (hash)
- * ========================================================== */
-window.addEventListener('hashchange', route);
-async function route(){
-  const hash = location.hash || '#/dashboard';
-  if(!STATE.company) await boot();
-
-  if(hash.startsWith('#/dashboard')){ setActive('nav-dash'); renderDashboard(); return; }
-  if(hash.startsWith('#/sites/')){    setActive('nav-sites'); const id = hash.split('/')[2]; renderSiteDetail(id); return; }
-  if(hash.startsWith('#/sites')){     setActive('nav-sites'); renderSites(); return; }
-  if(hash.startsWith('#/workers')){   setActive('nav-workers'); renderWorkers(); return; }
-  if(hash.startsWith('#/settings')){  setActive('nav-settings'); renderSettings(); return; }
-  setActive('nav-dash'); renderDashboard();
-}
-document.addEventListener('DOMContentLoaded', route);
-
-/* ==========================================================
- *  DASHBOARD
- * ========================================================== */
-function renderDashboard(){
+/* ------------ ROUTER ------------ */
+async function router(){
   const app = qs('#app');
-  // kpi demo (scadenze: calcoliamo se expiry_date entro 30gg)
-  const dueSoon = STATE.workers
-    .flatMap(w => Object.values(w.docs||{}))
-    .filter(d => !!d?.expiry_date)
-    .filter(d => {
-      const left = (new Date(d.expiry_date) - new Date())/86400000;
-      return left <= 30 && left >= 0;
-    }).length;
+  const hash = location.hash || '#/dashboard';
 
-  const nonCompliant = STATE.workers.filter(w => {
-    const d = w.docs||{};
-    return !(d.visita_medica && d.corso_generale && d.corso_specifica_fs && d.dpi_consegna);
-  }).length;
+  if (!STATE.sites.length)   { STATE.sites   = await fetch(`${API}/sites`).then(r=>r.json()).catch(()=>[]); }
+  if (!STATE.workers.length) { STATE.workers = await fetch(`${API}/workers`).then(r=>r.json()).catch(()=>[]); }
+  if (!STATE.company.name)   { STATE.company = await fetch(`${API}/company`).then(r=>r.json()).catch(()=>({})); }
 
+  if (hash.startsWith('#/sites/')){
+    const id = hash.split('/')[2];
+    renderSiteDetail(app, id);
+  } else if (hash==='#/sites'){
+    renderSites(app);
+  } else if (hash==='#/workers'){
+    renderWorkers(app);
+  } else if (hash==='#/pos'){
+    renderPOS(app);
+  } else if (hash==='#/ocr'){
+    renderOCR(app);
+  } else {
+    renderDashboard(app);
+  }
+}
+
+/* ------------ VIEWS ------------- */
+function renderDashboard(app){
   app.innerHTML = `
-    <div class="section">
-      <h3>Dashboard</h3>
-      <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px">
-        <div class="kpi">
-          <div class="label">Active sites</div>
-          <div style="font-size:26px;font-weight:800">${STATE.sites.length}</div>
-        </div>
-        <div class="kpi">
-          <div class="label">Docs due in 30 days</div>
-          <div style="font-size:26px;font-weight:800">${dueSoon}</div>
-        </div>
-        <div class="kpi">
-          <div class="label">Non-compliant workers</div>
-          <div style="font-size:26px;font-weight:800">${nonCompliant}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="flex-sb">
-        <h3>Sites</h3>
+    <div class="section-title">
+      <h2>Dashboard</h2>
+      <div class="hstack">
         <button class="btn" id="btnNewSite">+ New Site</button>
       </div>
-      <div class="grid cards">
-        ${STATE.sites.map(renderSiteCard).join('') || `<div class="muted">Nessun cantiere</div>`}
-      </div>
     </div>
 
-    <div class="section">
-      <div class="flex-sb">
-        <h3>Workers</h3>
-        <button class="btn" id="btnNewWorker">+ New Worker</button>
-      </div>
-      <div class="card">
-        ${renderWorkersTable(STATE.workers, false)}
-      </div>
+    <div class="grid grid-3">
+      <div class="card vstack"><div class="subtle">Active sites</div><div class="kpi">${STATE.sites.length}</div></div>
+      <div class="card vstack"><div class="subtle">Docs due in 30 days</div><div class="kpi">—</div></div>
+      <div class="card vstack"><div class="subtle">Non-compliant workers</div><div class="kpi">—</div></div>
     </div>
-  `;
 
-  qs('#btnNewSite')?.addEventListener('click', openNewSiteDialog);
-  qs('#btnNewWorker')?.addEventListener('click', openNewWorkerDialog);
+    <div class="section-title"><h3>Sites</h3><a class="btn-outline" href="#/sites">Vedi tutti</a></div>
+    <div class="grid grid-2" id="sitesGrid"></div>
+  `;
+  qs('#sitesGrid').innerHTML = STATE.sites.map(s => siteCard(s)).join('');
+  qs('#btnNewSite').onclick = openNewSiteDialog;
 }
 
-function renderSiteCard(s){
-  return `
-    <a class="card" href="#/sites/${s.id}">
-      <div class="caps">${s.id}</div>
-      <div style="font-weight:800;margin-top:4px">${s.name}</div>
-      <div class="muted" style="margin-top:6px">${s.address||'—'}</div>
-      <div class="muted" style="margin-top:6px"><strong style="color:#e2e8f0">Client:</strong> ${s.client||'—'}</div>
-      <div class="muted" style="margin-top:6px"><strong style="color:#e2e8f0">Period:</strong> ${(s.dates?.start||'—')} → ${(s.dates?.end||'—')}</div>
-    </a>
-  `;
-}
-
-/* ==========================================================
- *  SITES LIST
- * ========================================================== */
-function renderSites(){
-  const app = qs('#app');
+function renderSites(app){
   app.innerHTML = `
-    <div class="flex-sb section">
-      <h3>Sites</h3>
+    <div class="section-title">
+      <h2>Sites</h2>
       <button class="btn" id="btnNewSite">+ New Site</button>
     </div>
-    <div class="grid cards">
-      ${STATE.sites.map(renderSiteCard).join('') || `<div class="muted">Nessun cantiere</div>`}
-    </div>
+    <div class="grid grid-2" id="sitesGrid"></div>
   `;
-  qs('#btnNewSite')?.addEventListener('click', openNewSiteDialog);
+  qs('#sitesGrid').innerHTML = STATE.sites.map(s => siteCard(s)).join('');
+  qs('#btnNewSite').onclick = openNewSiteDialog;
 }
 
-/* ==========================================================
- *  WORKERS LIST
- * ========================================================== */
-function renderWorkers(){
-  const app = qs('#app');
-  app.innerHTML = `
-    <div class="flex-sb section">
-      <h3>Workers</h3>
-      <button class="btn" id="btnNewWorker">+ New Worker</button>
-    </div>
-    <div class="card">${renderWorkersTable(STATE.workers,true)}</div>
-  `;
-  qs('#btnNewWorker')?.addEventListener('click', openNewWorkerDialog);
-}
-function renderWorkersTable(list, showHeader=true){
-  const rows = list.map(w=>{
-    const d = w.docs||{};
-    const qual = !!(d.visita_medica && d.corso_generale && d.corso_specifica_fs);
-    const avanzOk = qual && !!d.dpi_consegna;
-    return `
-      <tr>
-        <td>
-          <div style="font-weight:600">${w.name}</div>
-          <div class="muted-small">${w.cf||''}</div>
-        </td>
-        <td>${UI.badgeQualified(qual)}</td>
-        <td>${UI.check(!!d.preposto)}</td>
-        <td>${UI.check(!!d.antincendio)}</td>
-        <td>${UI.check(!!d.primo_soccorso)}</td>
-        <td>${UI.progress(avanzOk)}</td>
-      </tr>
-    `;
-  }).join('');
+function siteCard(s){
+  const period = (s.dates?.start||'') && (s.dates?.end||'') ? `${s.dates.start} → ${s.dates.end}` : (s.dates?.start||'—');
   return `
-    <div style="overflow:auto">
+  <div class="sitecard" onclick="location.hash='#/sites/${s.id}'">
+    <div class="subtle">${s.id}</div>
+    <div style="font-weight:700">${s.name||'—'}</div>
+    <div class="subtle">${s.address||'—'}</div>
+    <div>Client: <span class="subtle">${s.client||'—'}</span></div>
+    <div class="subtle">Period: ${period||'—'}</div>
+  </div>`;
+}
+
+function renderWorkers(app){
+  app.innerHTML = `
+    <div class="section-title"><h2>Workers</h2></div>
+    <div class="card">
       <table class="table">
-        <thead>
+        <thead><tr><th>Nome</th><th>CF</th><th>Ruolo</th><th>Stato</th></tr></thead>
+        <tbody>${STATE.workers.map(w=>`
           <tr>
-            <th>Lavoratore</th>
-            <th>Stato</th>
-            <th>Preposto</th>
-            <th>Antincendio</th>
-            <th>Primo Soccorso</th>
-            <th>Avanzamento</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
+            <td>${w.name}</td>
+            <td class="subtle">${w.cf}</td>
+            <td>${w.role||'Operaio'}</td>
+            <td>${(w.docs?.visita_medica||w.docs?.corso_generale||w.docs?.corso_specifica_fs)?'<span class="pill-ok">Qualificato</span>':'<span class="pill-bad">Non qualificato</span>'}</td>
+          </tr>`).join('')}
+        </tbody>
       </table>
     </div>
   `;
 }
 
-/* ==========================================================
- *  SETTINGS (Company)
- * ========================================================== */
-function renderSettings(){
-  const c = STATE.company || {};
-  const app = qs('#app');
+function renderPOS(app){
   app.innerHTML = `
-    <div class="section">
-      <h3>Settings</h3>
+    <div class="section-title"><h2>POS</h2></div>
+    <div class="card">Apri un cantiere e genera il POS dalla tab “POS”.</div>
+  `;
+}
+
+function renderOCR(app){
+  app.innerHTML = `
+    <div class="section-title"><h2>OCR</h2></div>
+    <div class="card">Carica documenti dalla tab “Documents” del cantiere o dalla scheda lavoratore.</div>
+  `;
+}
+
+async function renderSiteDetail(app, id){
+  const site = STATE.sites.find(x=>x.id===id);
+  if (!site){ app.innerHTML = `<div class="card">Cantiere non trovato.</div>`; return; }
+
+  const assigned = await fetch(`${API}/sites/${id}/workers`).then(r=>r.json()).catch(()=>[]);
+
+  app.innerHTML = `
+    <div class="vstack" style="gap:8px;margin-bottom:8px">
+      <div class="hstack" style="justify-content:space-between">
+        <h2>${site.name}</h2>
+        <a class="btn-outline" href="#/sites">← Indietro</a>
+      </div>
+      <div class="subtle">${site.address||'—'}</div>
+      <div>Client: <span class="subtle">${site.client||'—'}</span></div>
+      <div class="subtle">Periodo: ${(site.dates?.start||'—')} → ${(site.dates?.end||'—')}</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h3>Workers</h3></div>
+      <table class="table" id="tblWorkers">
+        <thead><tr><th>Lavoratore</th><th>Tipo</th><th>Stato</th><th style="width:1%"></th></tr></thead>
+        <tbody>
+          ${assigned.map(w=>rowWorker(w,site.id)).join('')}
+        </tbody>
+      </table>
+      <hr>
+      <div class="hstack">
+        <select id="selAddWorker">
+          <option value="">Seleziona lavoratore…</option>
+          ${STATE.workers.map(w=>`<option value="${w.id}">${w.name} — ${w.cf}</option>`).join('')}
+        </select>
+        <button class="btn" id="btnAddWorker">Aggiungi</button>
+      </div>
+      <div class="help">L’assegnazione usa le nuove API: POST/DELETE <code>/api/sites/:id/workers</code>.</div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:14px">
       <div class="card">
-        <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px">
-          <div>
-            <label>Ragione sociale</label>
-            <input id="c_name" value="${c.name||''}">
-          </div>
-          <div>
-            <label>P. IVA</label>
-            <input id="c_vat" value="${c.vat||''}">
-          </div>
-          <div>
-            <label>Indirizzo</label>
-            <input id="c_address" value="${c.address||''}">
-          </div>
-          <div>
-            <label>Legale rappresentante</label>
-            <input id="c_legal" value="${c.legal_rep||''}">
-          </div>
-          <div>
-            <label>RSPP – Nome</label>
-            <input id="c_rspp_name" value="${c.rspp?.name||''}">
-          </div>
-          <div>
-            <label>RSPP – Email</label>
-            <input id="c_rspp_email" value="${c.rspp?.email||''}">
-          </div>
+        <div class="section-title">
+          <h3>POS</h3>
+          <button class="btn" id="btnGenPos">Genera POS (PDF)</button>
         </div>
-        <div class="divider"></div>
-        <button id="btnSaveCompany" class="btn">Salva</button>
+        <div id="posPreview" class="subtle">Seleziona i lavoratori da “Workers” (sopra) e genera il POS.</div>
+      </div>
+      <div class="card">
+        <div class="section-title"><h3>Documents</h3></div>
+        <div class="alert">Upload/OCR dalla scheda lavoratore (roadmap: estrazione scadenze automatica).</div>
       </div>
     </div>
   `;
-  qs('#btnSaveCompany')?.addEventListener('click', async ()=>{
-    const payload = {
-      name: qs('#c_name').value.trim(),
-      vat: qs('#c_vat').value.trim(),
-      address: qs('#c_address').value.trim(),
-      legal_rep: qs('#c_legal').value.trim(),
-      rspp: { name: qs('#c_rspp_name').value.trim(), email: qs('#c_rspp_email').value.trim() }
-    };
-    const res = await fetch(`${API}/company`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json()).catch(()=>null);
-    if(res?.ok){
-      STATE.company = res.company;
-      UI.toast('Impostazioni salvate');
-    }else{
-      UI.toast('Errore salvataggio impostazioni');
+
+  qs('#btnAddWorker').onclick = async ()=>{
+    const wid = qs('#selAddWorker').value;
+    if(!wid) return;
+    const resp = await fetch(`${API}/sites/${site.id}/workers`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ worker_id: wid })
+    });
+    if(!resp.ok){
+      alert('Impossibile assegnare (POST /api/sites/:id/workers)'); return;
     }
-  });
-}
-
-/* ==========================================================
- *  SITE DETAIL (tabs + workers table in stile screenshot)
- * ========================================================== */
-async function renderSiteDetail(siteId){
-  // Sync latest site data
-  const site = await fetch(`${API}/sites/${siteId}`).then(r=>r.json());
-  // ensure local state has it
-  const idx = STATE.sites.findIndex(s=>s.id===siteId);
-  if(idx>-1) STATE.sites[idx] = site; else STATE.sites.push(site);
-
-  // workers
-  if(!STATE.workers?.length){
-    STATE.workers = await fetch(`${API}/workers`).then(r=>r.json()).catch(()=>[]);
-  }
-  const workersAll = STATE.workers;
-  const workersInSite = (site.workers||[]).map(id => workersAll.find(w=>w.id===id)).filter(Boolean);
-
-  let activeTab = 'workers';
-  const app = qs('#app');
-  app.innerHTML = `
-    <div style="margin-bottom:16px">
-      <h2 style="font-size:22px;font-weight:800">${site.name}</h2>
-      <div class="muted" style="margin-top:6px">${site.address||'—'}</div>
-      <div class="muted" style="margin-top:4px"><strong style="color:#e2e8f0">Client:</strong> ${site.client||'—'}</div>
-      <div class="muted" style="margin-top:4px"><strong style="color:#e2e8f0">Periodo:</strong> ${(site.dates?.start||'—')} → ${(site.dates?.end||'—')}</div>
-    </div>
-
-    <div class="section-surface">
-      <div class="tabs" id="tabs">
-        <button class="tab" data-tab="overview">Overview</button>
-        <button class="tab active" data-tab="workers">Workers</button>
-        <button class="tab" data-tab="documents">Documents</button>
-        <button class="tab" data-tab="pos">Pos</button>
-        <button class="tab" data-tab="ocr">Ocr</button>
-        <button class="tab" data-tab="activity">Activity</button>
-      </div>
-      <div id="siteTabContent"></div>
-    </div>
-  `;
-
-  function mountTab(){
-    qsa('#tabs .tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===activeTab));
-    const box = qs('#siteTabContent');
-
-    if(activeTab==='workers'){
-      const rows = workersInSite.map(w=>{
-        const d = w.docs||{};
-        const qual = !!(d.visita_medica && d.corso_generale && d.corso_specifica_fs);
-        const avanzOk = qual && !!d.dpi_consegna;
-        return `
-          <tr>
-            <td>
-              <div style="font-weight:600">${w.name}</div>
-              <div class="muted-small">${w.cf||''}</div>
-            </td>
-            <td>Dipendente</td>
-            <td>${UI.badgeQualified(qual)}</td>
-            <td>${UI.check(!!d.preposto)}</td>
-            <td>${UI.check(!!d.antincendio)}</td>
-            <td>${UI.check(!!d.primo_soccorso)}</td>
-            <td>${UI.progress(avanzOk)}</td>
-          </tr>
-        `;
-      }).join('');
-
-      const options = workersAll
-        .filter(w => !(site.workers||[]).includes(w.id))
-        .map(w => `<option value="${w.id}">${w.name}</option>`).join('');
-
-      box.innerHTML = `
-        <div style="font-weight:700;margin-bottom:10px">Lavoratori assegnati</div>
-        <div style="overflow:auto">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Lavoratore</th>
-                <th>Tipo</th>
-                <th>Stato</th>
-                <th>Preposto</th>
-                <th>Antincendio</th>
-                <th>Primo Soccorso</th>
-                <th>Avanzamento</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-        <div class="add-row">
-          <select id="addWorkerSelect">${options || '<option disabled selected>Nessun lavoratore disponibile</option>'}</select>
-          <button id="btnAddWorker" class="btn">Aggiungi</button>
-        </div>
-      `;
-
-      qs('#btnAddWorker')?.addEventListener('click', async ()=>{
-        const sel = qs('#addWorkerSelect'); const workerId = sel?.value;
-        if(!workerId) return;
-        // preferita: route dedicata (già suggerita)
-        let ok = false;
-        try{
-          const r = await fetch(`${API}/sites/${site.id}/workers`,{
-            method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({workerId})
-          });
-          ok = r.ok;
-        }catch{}
-        if(!ok){
-          // fallback: ricarica sites (magari backend non ha route)
-          UI.toast('Impossibile assegnare (abilita POST /api/sites/:id/workers sul backend)');
-          return;
-        }
-        // refresh dettagli
-        renderSiteDetail(site.id);
-      });
-
-    } else if(activeTab==='overview'){
-      box.innerHTML = `
-        <div style="line-height:1.8">
-          <div><strong>Durata:</strong> ${(site.dates?.start||'—')} → ${(site.dates?.end||'—')} (${site.meta?.duration_days||'—'} gg)</div>
-          <div><strong>Note:</strong> ${(site.meta?.warnings||[]).join(', ') || '—'}</div>
-        </div>
-      `;
-    } else if(activeTab==='documents'){
-      box.innerHTML = `<div>Documenti del cantiere — (in arrivo)</div>`;
-    } else if(activeTab==='pos'){
-      box.innerHTML = `
-        <div class="flex" style="gap:10px">
-          <button id="btnPos" class="btn">Genera POS (PDF)</button>
-          <a id="posLink" class="btn-outline" style="display:none" target="_blank">Apri PDF</a>
-        </div>
-      `;
-      qs('#btnPos')?.addEventListener('click', async ()=>{
-        const res = await fetch(`${API}/pos`,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ site, workers: workersInSite })
-        }).then(r=>r.json()).catch(()=>null);
-        if(res?.url){
-          const a = qs('#posLink'); a.href = res.url; a.style.display='inline-flex';
-        }else{
-          UI.toast('Errore generazione POS');
-        }
-      });
-    } else if(activeTab==='ocr'){
-      box.innerHTML = `<div>Upload & OCR — (in arrivo)</div>`;
-    } else {
-      box.innerHTML = `<div>Activity log — (in arrivo)</div>`;
-    }
-  }
-
-  qs('#tabs').addEventListener('click', (e)=>{
-    const t = e.target.closest('.tab'); if(!t) return;
-    activeTab = t.dataset.tab; mountTab();
-  });
-  mountTab();
-}
-
-/* ==========================================================
- *  DIALOGS – quick add
- * ========================================================== */
-function openNewWorkerDialog(){
-  const name = prompt('Nome e cognome lavoratore:');
-  if(!name) return;
-  const cf = prompt('Codice fiscale (facoltativo):') || '';
-  fetch(`${API}/workers`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ name, cf })
-  }).then(r=>r.json()).then(async w=>{
-    STATE.workers = await fetch(`${API}/workers`).then(r=>r.json()).catch(()=>STATE.workers);
-    route();
-  }).catch(()=>UI.toast('Errore creazione lavoratore'));
-}
-function openNewSiteDialog(){
-  const name = prompt('Nome cantiere:');
-  if(!name) return;
-  const address = prompt('Indirizzo:') || '';
-  const client = prompt('Cliente:') || '';
-  const start = prompt('Data inizio (YYYY-MM-DD):') || '';
-  const end   = prompt('Data fine (YYYY-MM-DD):') || '';
-  const payload = {
-    name, address, client,
-    dates: { start, end },
-    roles: [] // backend assegna owner automatico se vuoto (V1.5)
+    routerToSameSite(site.id);
   };
-  fetch(`${API}/sites`,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  }).then(r=>r.json()).then(async s=>{
-    STATE.sites = await fetch(`${API}/sites`).then(r=>r.json()).catch(()=>STATE.sites);
-    location.hash = `#/sites/${s.id}`;
-  }).catch(()=>UI.toast('Errore creazione cantiere'));
+
+  qs('#btnGenPos').onclick = async ()=>{
+    const res = await fetch(`${API}/sites/${site.id}/workers`);
+    const workers = res.ok ? await res.json() : [];
+    const out = await fetch(`${API}/pos`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ site, workers })
+    }).then(r=>r.json()).catch(()=>null);
+    if(out?.ok && out.url){ window.open(out.url, '_blank'); }
+  };
 }
+
+function rowWorker(w, siteId){
+  const status = (w.docs?.visita_medica || w.docs?.corso_generale || w.docs?.corso_specifica_fs) ? 'Qualificato' : 'Non qualificato';
+  return `
+  <tr>
+    <td>${w.name}<div class="subtle">${w.cf}</div></td>
+    <td>${w.role || 'Dipendente'}</td>
+    <td>${status}</td>
+    <td><button class="btn-outline" onclick="removeWorker('${siteId}','${w.id}')">Rimuovi</button></td>
+  </tr>`;
+}
+async function removeWorker(siteId, workerId){
+  const res = await fetch(`${API}/sites/${siteId}/workers/${workerId}`, { method:'DELETE' });
+  if(!res.ok){ alert('Impossibile rimuovere'); return; }
+  routerToSameSite(siteId);
+}
+function routerToSameSite(id){ location.hash = `#/sites/${id}`; setTimeout(router, 0); }
+
+/* --------- MODAL NEW SITE ---------- */
+function openNewSiteDialog(){
+  const back = qs('#siteModal');
+  back.classList.add('show');
+
+  const get = id => qs(id);
+  get('#m_site_name').value = '';
+  get('#m_site_address').value = '';
+  get('#m_site_start').value = '';
+  get('#m_site_end').value = '';
+  get('#m_site_client').value = '';
+  get('#m_site_cse_email').value = '';
+
+  const close = ()=> back.classList.remove('show');
+  qs('#m_cancel').onclick = close;
+
+  qs('#m_create').onclick = async ()=>{
+    const name    = get('#m_site_name').value.trim();
+    const address = get('#m_site_address').value.trim();
+    const start   = get('#m_site_start').value || '';
+    const end     = get('#m_site_end').value   || '';
+    const client  = get('#m_site_client').value.trim();
+    const cseMail = get('#m_site_cse_email').value.trim();
+
+    if(!name){ alert('Inserisci il nome del cantiere'); return; }
+    if(!address){ alert('Inserisci l’indirizzo'); return; }
+    if(!start){ alert('Inserisci la data di inizio'); return; }
+
+    const payload = {
+      name, address, client,
+      dates: { start, end },
+      cse: { name:null, email: cseMail || null },
+      roles: [] // il backend assegna owner al creatore
+    };
+
+    const res = await fetch(`${API}/sites`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const site = await res.json().catch(()=>null);
+    if(!res.ok || !site?.id){
+      alert(site?.errors?.join('\n') || 'Errore creazione'); return;
+    }
+    STATE.sites = await fetch(`${API}/sites`).then(r=>r.json()).catch(()=>STATE.sites);
+    close();
+    location.hash = `#/sites/${site.id}`;
+  };
+
+  back.addEventListener('click', (ev)=>{ if(ev.target===back) back.classList.remove('show'); }, { once:true });
+}
+
+/* ------------ BOOT ------------- */
+(async function boot(){
+  setActive();
+  await router();
+})();
 </script>
 </body>
 </html>
